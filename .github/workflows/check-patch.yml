@@ -11,6 +11,10 @@ on:
   # 手動で「今すぐ試しに実行」もできるようにしておくボタン(任意・おすすめ)
   workflow_dispatch:
 
+# このワークフローがリポジトリに書き込み(コミット&プッシュ)できるようにする
+permissions:
+  contents: write
+
 jobs:
   check:
     # GitHubが無料で貸してくれる仮想のPC(Ubuntu)を1台使う、という意味
