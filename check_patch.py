@@ -18,6 +18,7 @@ NEWS_LIST_URL = "https://www.ea.com/ja/games/apex-legends/apex-legends/news"
 LAST_SEEN_FILE = "last_seen.json"
 DATA_FILE = "apex-data.json"
 MODEL_NAME = "gemini-flash-latest"
+FALLBACK_MODEL = "gemini-2.0-flash"  # 最新モデルが混雑していた場合の予備
 
 
 def fetch_latest_article_url():
@@ -51,21 +52,25 @@ def fetch_article_text(url):
     return text[:8000]
 
 
-def generate_with_retry(client, prompt, max_tries=4):
-    for attempt in range(1, max_tries + 1):
-        try:
-            return client.models.generate_content(
-                model=MODEL_NAME,
-                contents=prompt,
-            )
-        except Exception as e:
-            is_last = attempt == max_tries
-            print(f"Gemini呼び出し失敗(試行{attempt}/{max_tries}): {e}")
-            if is_last:
-                raise
-            wait_seconds = 15 * attempt
-            print(f"{wait_seconds}秒待って再試行します")
-            time.sleep(wait_seconds)
+def generate_with_retry(client, prompt, max_tries=3):
+    """Geminiが一時的に混雑している(503)ときのために、
+    少し待って複数回リトライする。それでもダメなら予備モデルに切り替える。"""
+    for model_name in [MODEL_NAME, FALLBACK_MODEL]:
+        for attempt in range(1, max_tries + 1):
+            try:
+                return client.models.generate_content(
+                    model=model_name,
+                    contents=prompt,
+                )
+            except Exception as e:
+                print(f"{model_name} 呼び出し失敗(試行{attempt}/{max_tries}): {e}")
+                is_last_attempt_for_model = attempt == max_tries
+                if not is_last_attempt_for_model:
+                    wait_seconds = 15 * attempt
+                    print(f"{wait_seconds}秒待って再試行します")
+                    time.sleep(wait_seconds)
+        print(f"{model_name} は諦めて次のモデルを試します")
+    raise RuntimeError("すべてのモデルで生成に失敗しました")
 
 
 def convert_with_gemini(patch_text, patch_url):
