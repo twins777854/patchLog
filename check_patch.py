@@ -1,12 +1,3 @@
-"""
-check_patch.py
----------------
-① EA公式のApexパッチノート一覧ページを見に行く
-② 前回チェック時と比べて新しい記事があるか確認する
-③ 新しければ本文を取得し、Gemini APIに投げて構造化データに変換する
-④ apex-data.json の先頭に追記する
-"""
-
 import os
 import re
 import json
@@ -18,7 +9,7 @@ NEWS_LIST_URL = "https://www.ea.com/ja/games/apex-legends/apex-legends/news"
 LAST_SEEN_FILE = "last_seen.json"
 DATA_FILE = "apex-data.json"
 MODEL_NAME = "gemini-flash-latest"
-FALLBACK_MODEL = "gemini-2.0-flash"  # 最新モデルが混雑していた場合の予備
+FALLBACK_MODEL = "gemini-2.0-flash"
 
 
 def fetch_latest_article_url():
@@ -53,8 +44,6 @@ def fetch_article_text(url):
 
 
 def generate_with_retry(client, prompt, max_tries=3):
-    """Geminiが一時的に混雑している(503)ときのために、
-    少し待って複数回リトライする。それでもダメなら予備モデルに切り替える。"""
     for model_name in [MODEL_NAME, FALLBACK_MODEL]:
         for attempt in range(1, max_tries + 1):
             try:
@@ -64,8 +53,7 @@ def generate_with_retry(client, prompt, max_tries=3):
                 )
             except Exception as e:
                 print(f"{model_name} 呼び出し失敗(試行{attempt}/{max_tries}): {e}")
-                is_last_attempt_for_model = attempt == max_tries
-                if not is_last_attempt_for_model:
+                if attempt != max_tries:
                     wait_seconds = 15 * attempt
                     print(f"{wait_seconds}秒待って再試行します")
                     time.sleep(wait_seconds)
@@ -76,10 +64,9 @@ def generate_with_retry(client, prompt, max_tries=3):
 def convert_with_gemini(patch_text, patch_url):
     client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 
-    prompt = f"""
-以下はApex Legendsの新しいパッチノートのページから抜き出した本文です。
+    prompt = f"""以下はApex Legendsの新しいパッチノートのページから抜き出した本文です。
 レジェンド・武器ごとの変更点を、次のJSON形式の配列だけで出力してください。
-説明文やコードブロック記号(```)は不要です。JSON配列だけを返してください。
+説明文やコードブロック記号は不要です。JSON配列だけを返してください。
 
 [
   {{"target": "キャラ名または武器名", "type": "buff", "magnitude": 1, "text": "変更内容を日本語で簡潔に"}}
