@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>patch//log — ゲームパッチノートまとめ</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root{
+  --bg:#0f1219;
+  --panel:#161b26;
+  --panel-2:#1c2230;
+  --border:#2a3040;
+  --text:#e7e5df;
+  --text-dim:#8b93a3;
+  --text-faint:#565f70;
+  --buff:#6fbf8b;
+  --nerf:#e2704f;
+  --change:#e0ab58;
+  --new:#5fa8d3;
+  --mono: 'IBM Plex Mono', monospace;
+  --disp: 'Rajdhani', sans-serif;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;overflow-x:hidden;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--mono);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+
+.shell{
+  display:grid;
+  grid-template-columns:1fr;
+  grid-template-rows:auto 1fr auto;
+  grid-template-areas:"topbar" "main" "footer";
+  min-height:100vh;
+  padding-left:58px;
+}
+@media (max-width:820px){
+  .shell{ padding-left:0; }
+}
+
+/* ---- header ---- */
+.topbar{
+  grid-area:topbar;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0;
+  border-bottom:1px solid var(--border);
+  background:#0f1219;
+  position:relative;
+  overflow:hidden;
+}
+.brand-panel{
+  position:relative; display:flex; align-items:center; height:100%;
+  padding:18px 40px 18px 28px;
+  background:var(--buff);
+  clip-path:polygon(0 0,100% 0,calc(100% - 34px) 100%,0 100%);
+}
+.brand{ display:flex; align-items:baseline; gap:10px; position:relative; z-index:1; }
+.brand .mark{ font-family:var(--disp); font-weight:700; font-style:italic; font-size:22px; letter-spacing:0; color:#0b0d12; text-transform:uppercase; }
+.brand .mark span{color:#0b0d12; opacity:0.55;}
+.brand .tag{ font-size:10px; color:#0b0d12; opacity:0.65; letter-spacing:0.12em; font-weight:600; }
+.topbar-right{ display:flex; align-items:center; gap:16px; padding-right:28px; }
+.searchbox{
+  display:flex; align-items:center; gap:8px;
+  background:var(--panel-2); border:1px solid var(--border); border-radius:3px;
+  padding:7px 12px; font-size:12px; color:var(--text-faint); min-width:200px;
+}
+.searchbox svg{flex:none;opacity:0.6;}
+
+/* ---- sidebar ---- */
+.sidebar{
+  position:fixed; top:0; left:0; bottom:0; z-index:100; width:58px; overflow:hidden;
+  border-right:1px solid var(--border); padding:18px 0; background:var(--panel);
+  display:flex; flex-direction:column; transition:width .18s ease;
+}
+.sidebar:hover{ width:250px; box-shadow:12px 0 30px -10px rgba(0,0,0,0.6); }
+.sidebar-label{ font-size:10px; letter-spacing:0.14em; color:var(--text-faint); padding:0 20px 10px; text-transform:uppercase; white-space:nowrap; opacity:0; transition:opacity .12s ease; }
+.sidebar:hover .sidebar-label{ opacity:1; transition-delay:.08s; }
+.game-list{ flex:1; }
+.game-item{
+  display:flex; align-items:center; gap:12px; padding:11px 14px; cursor:pointer;
+  border-left:2px solid transparent; transition:background .15s ease, border-color .15s ease;
+  white-space:nowrap;
+}
+.game-item:hover{background:var(--panel-2);}
+.game-item.active{ background:var(--panel-2); border-left-color:var(--buff); }
+.g-icon{
+  width:30px;height:30px;border-radius:3px;flex:none;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--border);
+}
+.game-item .g-text{ opacity:0; transition:opacity .12s ease; }
+.sidebar:hover .game-item .g-text{ opacity:1; transition-delay:.08s; }
+.game-item .g-name{ font-family:var(--disp); font-weight:600; font-size:14px; color:var(--text); }
+.game-item .g-meta{ font-size:10.5px; color:var(--text-faint); margin-top:2px; }
+
+.add-game-wrap{ padding:14px 20px 4px; border-top:1px solid var(--border); margin-top:10px; opacity:0; transition:opacity .12s ease; }
+.sidebar:hover .add-game-wrap{ opacity:1; transition-delay:.08s; }
+.add-game-btn{
+  width:100%; display:flex; align-items:center; justify-content:center; gap:6px;
+  border:1px dashed var(--border); background:none; color:var(--text-dim);
+  font-family:var(--mono); font-size:12px; padding:9px; border-radius:3px; cursor:pointer;
+  white-space:nowrap;
+}
+.add-game-btn:hover{ border-color:var(--new); color:var(--text); }
+.add-game-form{ display:none; flex-direction:column; gap:8px; margin-top:10px; }
+.add-game-form.open{ display:flex; }
+.add-game-form input{
+  background:var(--panel-2); border:1px solid var(--border); color:var(--text);
+  font-family:var(--mono); font-size:12px; padding:8px 10px; border-radius:6px; outline:none;
+}
+.add-game-form input:focus{ border-color:var(--new); }
+.add-game-form .row{ display:flex; gap:8px; }
+.add-game-form button{
+  font-family:var(--mono); font-size:11.5px; padding:7px 10px; border-radius:6px; cursor:pointer; border:none;
+}
+.add-game-form .submit{ background:var(--buff); color:#0f1219; font-weight:600; flex:1; }
+.add-game-form .cancel{ background:none; color:var(--text-faint); border:1px solid var(--border); }
+
+@media (max-width:820px){
+  .sidebar{ position:static; width:100%; padding:12px 0; }
+  .sidebar:hover{ width:100%; box-shadow:none; }
+  .sidebar-label,.game-item .g-text,.add-game-wrap{ opacity:1; }
+  .game-list{ display:flex; overflow-x:auto; padding:0 12px; }
+  .sidebar-label{display:none;}
+  .game-item{ flex:none; border-left:none; border-bottom:2px solid transparent; padding:8px 12px; }
+  .game-item.active{border-bottom-color:var(--buff);}
+  .game-item .g-meta{display:none;}
+  .add-game-wrap{ border-top:none; margin-top:0; padding:10px 12px; }
+}
+
+/* ---- main ---- */
+main{grid-area:main; padding:32px 48px 60px; max-width:1300px; margin:0 auto; width:100%;}
+@media (max-width:600px){ main{padding:22px 18px 48px;} }
+
+.game-head{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:6px; }
+.game-head .g-icon-lg{
+  width:40px;height:40px;border-radius:3px;flex:none;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--border);
+}
+.game-head h1{ font-family:var(--disp); font-size:26px; margin:0; letter-spacing:-0.01em; flex:1; }
+.latest-badge{
+  font-family:var(--mono); font-size:11px; color:var(--bg); background:var(--buff);
+  padding:4px 10px; border-radius:0; font-weight:600; letter-spacing:0.04em; text-transform:uppercase;
+  clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px);
+}
+.latest-badge.empty{ background:var(--panel-2); color:var(--text-faint); border:1px solid var(--border); }
+.game-sub{ font-size:12.5px; color:var(--text-dim); margin-bottom:22px; }
+
+/* roster */
+.roster-label{ font-size:10px; letter-spacing:0.12em; color:var(--text-faint); text-transform:uppercase; margin-bottom:10px; }
+
+.section-toggle{ display:inline-flex; background:var(--panel); border:1px solid var(--border); padding:0; margin-bottom:24px; gap:2px; }
+.sec-tab{
+  font-family:var(--disp); font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:0.03em;
+  padding:9px 24px; border:none; clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);
+  background:var(--panel-2); color:var(--text-faint); cursor:pointer; transition:background .15s ease, color .15s ease;
+}
+.sec-tab:hover{ color:var(--text-dim); }
+.sec-tab.active{ background:var(--game-color,var(--buff)); color:#0b0d12; }
+.roster{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:28px; }
+.roster-chip{
+  display:flex; flex-direction:row; align-items:center; gap:10px;
+  background:#161822; border:none; border-left:4px solid var(--border);
+  padding:9px 12px; cursor:pointer; text-align:left;
+  transition:border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.roster-chip:hover{ background:#1c1f2c; }
+.roster-chip.active{ border-left-color:var(--game-color,var(--buff)); background:#1c1f2c; box-shadow:inset 0 0 0 1px rgba(255,255,255,0.06); }
+.roster-chip.all{ justify-content:center; }
+.roster-chip.all.active{ border-left-color:var(--new); }
+.avatar{
+  width:26px;height:26px;border-radius:3px;flex:none;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--disp); font-weight:700; font-size:11px; color:#0f1219;
+}
+.roster-chip .r-name{ font-size:13px; color:var(--text); font-weight:700; line-height:1.25; text-transform:uppercase; letter-spacing:0.01em; }
+.roster-chip .r-role{ font-size:9.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.04em; }
+
+/* strength meter */
+.meter-track{
+  width:56px; height:6px; border-radius:1px; background:var(--border);
+  position:relative; flex:none;
+}
+.meter-track::before{
+  content:''; position:absolute; left:50%; top:-2px; width:1px; height:10px;
+  background:var(--text-faint); transform:translateX(-0.5px);
+}
+.meter-fill{ position:absolute; top:0; height:100%; }
+.meter-fill.buff{ left:50%; background:var(--buff); }
+.meter-fill.nerf{ right:50%; background:var(--nerf); }
+.meter-fill.m1{ width:8px; }
+.meter-fill.m2{ width:18px; }
+.meter-fill.m3{ width:28px; }
+.meter-dot{
+  width:56px; height:6px; display:flex; align-items:center; justify-content:center; flex:none;
+}
+.meter-dot span{ width:6px; height:6px; border-radius:1px; }
+
+/* character detail view */
+.char-head{ display:flex; align-items:center; gap:14px; margin-bottom:6px; }
+.char-head .avatar{ width:44px; height:44px; font-size:16px; }
+.char-head h2{ font-family:var(--disp); font-size:20px; margin:0; }
+.char-head .role{ font-size:11.5px; color:var(--text-dim); }
+.char-summary{ font-size:11.5px; color:var(--text-faint); margin:8px 0 24px; }
+.char-summary b.b{color:var(--buff);} .char-summary b.n{color:var(--nerf);}
+.back-link{
+  display:inline-flex; align-items:center; gap:6px; font-size:11.5px; color:var(--text-dim);
+  cursor:pointer; margin-bottom:18px; border:none; background:none; padding:0; font-family:var(--mono);
+}
+.back-link:hover{ color:var(--text); }
+
+.ability-block{ margin-bottom:26px; }
+.ability-block-label{ font-size:10px; letter-spacing:0.12em; color:var(--text-faint); text-transform:uppercase; margin-bottom:10px; }
+.ability-row{ display:flex; gap:12px; align-items:flex-start; padding:10px 0; border-bottom:1px solid var(--border); }
+.ability-row:last-child{ border-bottom:none; }
+.ability-tag{
+  flex:none; width:88px; font-size:10px; padding:3px 8px; border-radius:4px; text-align:center;
+  font-weight:600; letter-spacing:0.02em;
+}
+.ability-tag.passive{ background:var(--panel-2); color:var(--text-dim); border:1px solid var(--border); }
+.ability-tag.tactical{ background:var(--new)22; color:var(--new); }
+.ability-tag.ultimate{ background:var(--change)22; color:var(--change); }
+.ability-tag.mod{ font-size:13px; font-weight:700; padding:5px 10px; letter-spacing:0.03em; }
+.ability-name{ font-family:var(--disp); font-size:13px; font-weight:600; color:var(--text); margin-bottom:2px; }
+.ability-desc{ font-size:12px; color:var(--text-dim); line-height:1.6; }
+
+.perk-tier{ margin-bottom:14px; }
+.perk-tier-label{ font-family:var(--disp); font-size:11px; font-weight:700; color:var(--text-dim); margin-bottom:8px; letter-spacing:0.04em; }
+.perk-opts{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+@media (max-width:560px){ .perk-opts{ grid-template-columns:1fr; } }
+.perk-opt{ background:var(--panel); border:1px solid var(--border); border-radius:3px; padding:10px 12px; }
+.perk-name{ font-family:var(--disp); font-size:12.5px; font-weight:600; color:var(--text); margin-bottom:4px; }
+.perk-desc{ font-size:11.5px; color:var(--text-dim); line-height:1.55; }
+
+.char-entry{
+  display:flex; align-items:flex-start; gap:14px;
+  padding:12px 0; border-bottom:1px solid var(--border);
+}
+.char-entry:last-child{ border-bottom:none; }
+.char-entry .cev{ font-size:11px; color:var(--text-faint); width:78px; flex:none; }
+.char-entry .cev .cver{ font-family:var(--disp); font-weight:700; color:var(--text); font-size:12.5px; display:block; }
+.char-entry .ctext{ font-size:13px; color:#d3d1cb; flex:1; line-height:1.6; }
+
+/* timeline view (all changes) */
+.filters{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:26px; }
+.chip{
+  font-size:11px; padding:5px 10px; border-radius:5px; border:1px solid var(--border);
+  color:var(--text-dim); display:flex; align-items:center; gap:6px; cursor:default;
+}
+.chip .sw{width:7px;height:7px;border-radius:2px;}
+
+.entry{ border-left:1px solid var(--border); padding-left:22px; margin-left:5px; padding-bottom:30px; position:relative; }
+.entry:last-child{padding-bottom:0;}
+.entry::before{
+  content:''; position:absolute; left:-5.5px; top:3px; width:10px;height:10px;
+  border-radius:50%; background:var(--bg); border:2px solid var(--buff);
+}
+.entry-head{ display:flex; align-items:baseline; gap:12px; margin-bottom:12px; flex-wrap:wrap; }
+.ver{ font-family:var(--disp); font-weight:700; font-size:16px; color:var(--text); }
+.date{ font-size:11.5px; color:var(--text-faint); }
+.entry-title{ font-size:12.5px; color:var(--text-dim); margin-bottom:14px; }
+.diff-line{ display:flex; align-items:center; gap:12px; font-size:13px; line-height:1.5; padding:5px 0; }
+.diff-sym{ font-weight:600; flex:none; width:14px; text-align:center; }
+.diff-line.buff .diff-sym{color:var(--buff);}
+.diff-line.nerf .diff-sym{color:var(--nerf);}
+.diff-line.change .diff-sym{color:var(--change);}
+.diff-line.new .diff-sym{color:var(--new);}
+.diff-line.fix .diff-sym{color:var(--new);}
+.diff-line .body{color:#d3d1cb; flex:1;}
+.diff-line .target{color:var(--text);font-weight:600;}
+
+.empty-state{
+  border:1px dashed var(--border); border-radius:3px; padding:28px 22px; text-align:center;
+  color:var(--text-faint); font-size:12.5px; line-height:1.7;
+}
+
+footer{ grid-area:footer; border-top:1px solid var(--border); padding:20px 40px 32px; font-size:11px; color:var(--text-faint); }
+@media (max-width:600px){ footer{padding:18px;} }
+
+/* class / weapon-type filter — hover flyout, inline next to roster label */
+.roster-header{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+.roster-header .roster-label{ margin-bottom:0; }
+.filter-flyout{ position:relative; display:inline-flex; }
+.filter-trigger{
+  display:flex; align-items:center; gap:6px; padding:6px 11px; border-radius:3px;
+  border:1px solid var(--border); background:var(--panel); color:var(--text-dim);
+  font-family:var(--mono); font-size:11px; cursor:pointer;
+}
+.filter-trigger .car{ font-size:9px; color:var(--text-faint); transition:transform .15s ease; }
+.filter-flyout.has-sel .filter-trigger{ border-color:var(--tab-color,var(--buff)); color:var(--text); }
+.filter-trigger.primary{
+  font-family:var(--disp); font-weight:700; font-size:14px; color:var(--text); text-transform:uppercase; letter-spacing:0.02em;
+  padding:9px 18px 9px 14px; background:var(--panel-2); border-radius:0;
+  clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);
+}
+.filter-flyout.primary.has-sel .filter-trigger.primary{ background:var(--tab-color,var(--buff)); color:#0b0d12; border-color:transparent; }
+.filter-panel{
+  position:absolute; top:calc(100% + 6px); left:0; z-index:30;
+  display:none; flex-direction:column; gap:6px; min-width:190px;
+  background:var(--panel); border:1px solid var(--border); border-radius:3px;
+  padding:10px; box-shadow:0 12px 28px -8px rgba(0,0,0,0.55);
+}
+.filter-flyout:hover .filter-panel,
+.filter-flyout:focus-within .filter-panel{ display:flex; }
+.filter-panel.grid{
+  display:none; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:8px;
+  min-width:340px; max-width:560px; max-height:420px; overflow-y:auto;
+}
+.filter-flyout:hover .filter-panel.grid,
+.filter-flyout:focus-within .filter-panel.grid{ display:grid; }
+.filter-panel.grid .roster-chip{ margin:0; }
+.filter-trigger .car{ font-size:9px; color:var(--text-faint); transition:transform .15s ease; }
+.filter-flyout:hover .filter-trigger .car,
+.filter-flyout:focus-within .filter-trigger .car{ transform:rotate(180deg); }
+.class-tab{
+  --tab-color:#8b93a3;
+  display:flex; align-items:center; gap:9px; padding:7px 14px 7px 10px; border-radius:0;
+  border:none; background:var(--panel-2); cursor:pointer;
+  clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);
+  transition:background .15s ease, color .15s ease;
+}
+.class-tab:hover{ background:#232838; }
+.class-tab.active{
+  background:var(--tab-color); box-shadow:none;
+}
+.class-tab.active .ct-label,
+.class-tab.active .ct-count{ color:#0b0d12; }
+.ct-icon{ width:20px;height:20px;border-radius:3px;flex:none; display:flex;align-items:center;justify-content:center; }
+.ct-label{ font-family:var(--disp); font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.02em; color:var(--text); flex:1; white-space:nowrap; }
+.ct-count{ font-size:9.5px; color:var(--text-faint); font-family:var(--mono); }
+
+.class-row{
+  display:flex; flex-wrap:wrap; gap:8px; margin-bottom:24px;
+  padding-bottom:16px; border-bottom:1px solid var(--border);
+}
+.class-row .class-tab{ flex:none; }
+@media (max-width:600px){
+  .class-row{ flex-wrap:nowrap; overflow-x:auto; padding-bottom:12px; }
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <div class="topbar">
+    <div class="brand-panel">
+      <div class="brand">
+        <div class="mark">Patch<span id="logAccent">Log</span></div>
+        <div class="tag">GAME UPDATE TRACKER</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="searchbox">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span>タイトル・武器・キャラ名で検索…</span>
+      </div>
+    </div>
+  </div>
+
+  <nav class="sidebar">
+    <div class="sidebar-label">追跡中のゲーム</div>
+    <div class="game-list" id="gameList"></div>
+    <div class="add-game-wrap">
+      <button class="add-game-btn" id="addGameToggle">＋ ゲームを追加</button>
+      <div class="add-game-form" id="addGameForm">
+        <input type="text" id="newGameName" placeholder="ゲームタイトル（例: Street Fighter 6）" maxlength="30">
+        <div class="row">
+          <button class="submit" id="addGameSubmit">追加</button>
+          <button class="cancel" id="addGameCancel">キャンセル</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main"></main>
+
+
+  <footer>
+    表示中のパッチ内容は各ゲーム公式パッチノート・シーズン情報をもとに要約したものです（2025年8月〜2026年8月ごろの主要アップデートを抜粋。全パッチ・全項目を網羅したものではありません）。強さの変化量メーターは記事の記述から目安として付与した参考値です。「＋ゲームを追加」で追加したタイトルはキャラクター・パッチ情報が未登録の状態で表示されます。
+  </footer>
+</div>
+
+<script>
+/* ---------- abstract per-game icon marks (not official logos) ---------- */
+const ICONS = {
+  diamond: (c)=>`<svg width="16" height="16" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" transform="rotate(45 12 12)" fill="none" stroke="${c}" stroke-width="2"/></svg>`,
+  hex: (c)=>`<svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12,3 20,7.5 20,16.5 12,21 4,16.5 4,7.5" fill="none" stroke="${c}" stroke-width="2"/></svg>`,
+  bolt: (c)=>`<svg width="16" height="16" viewBox="0 0 24 24"><polygon points="13,2 5,14 11,14 9,22 19,9 13,9" fill="${c}"/></svg>`,
+  peak: (c)=>`<svg width="16" height="16" viewBox="0 0 24 24"><polyline points="3,18 9,7 12,12 15,6 21,18" fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>`,
+  orbit: (c)=>`<svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="${c}"/><ellipse cx="12" cy="12" rx="9" ry="4" fill="none" stroke="${c}" stroke-width="1.6"/></svg>`,
+  spark: (c)=>`<svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="${c}" stroke-width="2"/><line x1="12" y1="4" x2="12" y2="7" stroke="${c}" stroke-width="2"/><line x1="12" y1="17" x2="12" y2="20" stroke="${c}" stroke-width="2"/></svg>`,
+};
+const ICON_KEYS = Object.keys(ICONS);
+function iconHtml(shape,color,size){
+  const svg = ICONS[shape](color);
+  return `<div class="${size}" style="background:${color}18">${svg}</div>`;
+}
+
+const SYM = {buff:"+", nerf:"-", change:"~", new:"*", fix:"*"};
+const LABEL = {buff:"バフ", nerf:"ナーフ", change:"調整", new:"新規", fix:"修正"};
+const NEW_GAME_COLORS = ["#7fb2e0","#e08a6b","#8fcf9a","#d68fd6","#e0cf6b","#6bd6c4"];
+
+const DATA = {
+  apex: {
+    name:"Apex Legends", color:"#DA3D3B", tagline:"Respawn Entertainment / バトロワFPS", updated:"2026-08-04", icon:"peak",
+    rosterLabel:"レジェンド",
+    weaponsLabel:"武器",
+    roster:[
+      {id:"bloodhound",name:"ブラッドハウンド",role:"リーコン",
+        passives:[{name:"リコン",desc:"調査ビーコンをスキャンし、次のリングの場所を特定する"},{name:"トラッカー（強化）",desc:"敵が移動すると光る痕跡を残すようになり、それを辿って追跡できる"}],
+        tactical:{name:"全能の目（強化）",desc:"3秒間、視界内を全身スキャンしたのち、1.5秒間隔で4回のスナップショットスキャンが発生し、敵や罠、手がかりを暴き続ける"},
+        ultimate:{name:"オールファーザーのクローク",desc:"設置したデバイスの範囲内にいる味方全員をクローク（透明化）状態にする。移動速度+20%と脅威の視認性向上も得られる。範囲を出たあとも、ダメージを受けるか発砲するまで12秒間効果が持続する"},
+        perks:[{tier:"LV2",options:[{name:"ヒドゥンサイト",desc:"アルティメット使用時に戦術アビリティをリフレッシュしつつ、敵から検知されなくなる"},{name:"バーズアイ",desc:"白いカラスを送り出し、別の部隊を独立して偵察できる"}]},{tier:"LV3",options:[{name:"トゥループレデター",desc:"武器を発砲したあとも、再びクローク状態に戻れる"},{name:"ハンターズアジリティ",desc:"戦術の発動が速くなり、クールダウンが5秒短縮される"}]}]},
+      {id:"gibraltar",name:"ジブラルタル",role:"サポート",
+        passives:[{name:"鉄壁",desc:"被ダメージを15%軽減。被弾による速度低下を受けない"},{name:"ガンシールド",desc:"照準器越しにエイムするとガンシールドが展開し、被弾を防ぐ"}],
+        tactical:{name:"プロテクトドーム",desc:"内側と外側の両方の攻撃をブロックする"},
+        ultimate:{name:"防衛爆撃",desc:"スモークでマーキングした地点に迫撃砲の集中攻撃を要請する"},
+        perks:[{tier:"LV2",options:[{name:"サンダードーム",desc:"ドームに最初に侵入した敵にダメージとEMP効果を与える"},{name:"ドームヒーリング",desc:"ドーム内にいる間、小回復アイテムの回復量が2倍になる"}]},{tier:"LV3",options:[{name:"トリプルボンバードメント",desc:"チャージが3回になるが、アルティメットの効果範囲が縮小する"},{name:"ファストショッティ",desc:"ショットガン使用時に移動速度が上昇、ノックダウン時に自動リロードされる"}]}]},
+      {id:"lifeline",name:"ライフライン",role:"サポート",
+        passives:[{name:"コンバットグライド",desc:"D.O.C.を掴んで滑空でき、展開して仲間を復活させられる"}],
+        tactical:{name:"D.O.C.ヒールドローン",desc:"D.O.C.が近くの味方を回復する。味方を指定して追従させることも可能"},
+        ultimate:{name:"D.O.C.ヘイローシールド",desc:"ヘイローシールドシステムを展開し敵弾を弾く。範囲内は回復アイテムの使用速度も上昇する"},
+        perks:[{tier:"LV2",options:[{name:"エクステンデッドフライト",desc:"D.O.C.で滑空できる時間が1.5秒長くなる"},{name:"バットパック",desc:"シールドバッテリーのスタック上限が1増加し、デスボックスに数が表示される"}]},{tier:"LV3",options:[{name:"エンハンスドラジオ",desc:"D.O.C.に指示を送れる距離が50%増加する"},{name:"戦術クールダウン+",desc:"戦術のクールダウンが10秒短縮する"}]}]},
+      {id:"pathfinder",name:"パスファインダー",role:"スカーミッシャー",
+        passives:[{name:"リコン",desc:"調査ビーコンをスキャンし、次のリングの場所を特定する"},{name:"内部情報",desc:"ビーコンをスキャンするたびにジップラインガンのクールダウンが短縮される"}],
+        tactical:{name:"グラップリングフック",desc:"移動の難しい場所へ素早く移動できる"},
+        ultimate:{name:"ジップラインガン",desc:"誰もが使用できるジップラインを作り出す"},
+        perks:[{tier:"LV2",options:[{name:"フィールドリサーチ",desc:"調査ビーコンへのアクセスを獲得し、エイム時に敵を強調表示する"},{name:"リングマスター",desc:"リングコンソールへのアクセス、ゾーンオーバーチャージ、硬質光メッシュの強化を獲得する"}]},{tier:"LV3",options:[{name:"ランディングギア",desc:"空中制御が向上し、軟着地できる"},{name:"フィーリングジッピー",desc:"ジップラインのチャージを追加獲得。味方は通電したジップラインで高速移動できる"}]}]},
+      {id:"wraith",name:"レイス",role:"スカーミッシャー",
+        passives:[{name:"虚空からの声",desc:"危機が迫ると謎の声が語りかけ、危険を知らせてくれる"}],
+        tactical:{name:"虚空へ",desc:"虚空を通り、ダメージを受けずに安全かつ迅速に移動する"},
+        ultimate:{name:"ディメンションリフト",desc:"2地点間をポータルで60秒間連結する"},
+        perks:[{tier:"LV2",options:[{name:"第6感",desc:"近くの敵部隊数が増加するとパッシブが警告する"},{name:"フェーズドーム",desc:"ポータル起動時、効果範囲内のプレイヤーがフェーズ状態になる"}]},{tier:"LV3",options:[{name:"ファストフェーズ",desc:"戦術アビリティ発動までの時間が30%短縮する"},{name:"ヴォイドジャンパー",desc:"虚空にいる間ダブルジャンプが可能になり、滞在時間が長くなる"}]}]},
+      {id:"bangalore",name:"バンガロール",role:"アサルト",
+        passives:[{name:"駆け足",desc:"スプリント中に被弾すると、移動速度が短時間向上する"}],
+        tactical:{name:"スモークランチャー",desc:"発煙缶を高速射出し、着弾時の爆発で煙の壁を作り出す"},
+        ultimate:{name:"ローリングサンダー",desc:"一帯をゆっくりと巡る支援砲撃を要請する"},
+        perks:[{tier:"LV2",options:[{name:"帯電煙幕",desc:"戦術で敵アルティメットに100ダメージを与え、戦術アビリティを破壊する"},{name:"援護しろ",desc:"スモーク内にいる間、味方のHPが自動回復する。パッシブ発動中の敵を自動でマークする"}]},{tier:"LV3",options:[{name:"ECMペイロード",desc:"アルティメットのダメージが10増加し、敵が展開したものをすべて破壊する"},{name:"名誉勲章",desc:"ノックダウンした味方へ走ると、復活とパッシブの発動が早くなる"}]}]},
+      {id:"caustic",name:"コースティック",role:"コントローラー",
+        passives:[{name:"鉄壁",desc:"被ダメージを15%軽減。被弾による速度低下を受けない"},{name:"NOXガスビジョン",desc:"ガスの中を移動する敵を強調表示する"}],
+        tactical:{name:"NOXガストラップ",desc:"強力なNoxガスを放つ容器を最大6つ配置する。射撃か敵の接近で起動する"},
+        ultimate:{name:"NOXガスグレネード",desc:"広いエリアをNoxガスで包む"},
+        perks:[{tier:"LV2",options:[{name:"エクストラトラップ",desc:"戦術のチャージを追加獲得し、罠をさらに2つ設置できる"},{name:"吸いこんでみろ",desc:"Noxガスに包まれている間、HPが自動回復する"}]},{tier:"LV3",options:[{name:"パーティクルディフューザー",desc:"アルティメットの効果範囲が50%増加する"},{name:"ガスファイター",desc:"Noxガスに包まれている間、戦術のリチャージが300%速くなる"}]}]},
+      {id:"mirage",name:"ミラージュ",role:"サポート",
+        passives:[{name:"神出鬼没",desc:"リスポーンビーコン使用時や仲間の復活時に自動でクロークが発動する"}],
+        tactical:{name:"サイクアウト",desc:"ホログラフのデコイを発生させて敵を混乱させる。デコイは操作可能"},
+        ultimate:{name:"パーティライフ",desc:"操作可能なデコイ集団を展開して敵の注意を引く"},
+        perks:[{tier:"LV2",options:[{name:"ルネッサンスマン",desc:"調査ビーコン・リングコンソールを使用でき、ケアパッケージをスキャンできる"},{name:"ブーズルアイ",desc:"偽装が成功すると、敵を短時間ハイライト表示する"}]},{tier:"LV3",options:[{name:"ミー・トゥー",desc:"デコイのチャージを1つ獲得し、両方を同時に起動できる"},{name:"偽装ボーナス",desc:"偽装の成功時に戦術アビリティがリフレッシュされる"}]}]},
+      {id:"octane",name:"オクタン",role:"スカーミッシャー",
+        passives:[{name:"高速修復",desc:"ダメージを受けていない間、体力が少しずつ回復する"}],
+        tactical:{name:"興奮剤",desc:"体力を消費して6秒間、歩行・スプリント速度が上昇する。速度低下も軽減する"},
+        ultimate:{name:"ジャンプパッド",desc:"乗った者を空中へ射出するジャンプパッドを展開する。空中でダブルジャンプできる"},
+        perks:[{tier:"LV2",options:[{name:"ストロングスキン",desc:"興奮剤で受けるダメージが5減少する"},{name:"スクワッドラッシュ",desc:"ジャンプパッドで着地した後、味方も興奮剤の効果を得る"}]},{tier:"LV3",options:[{name:"デアデビル",desc:"体力が少ないほど興奮剤の効果時間が長くなる"},{name:"トリプルジャンプ",desc:"ジャンプパッドをアップグレードし3回ジャンプ可能にする"}]}]},
+      {id:"wattson",name:"ワットソン",role:"コントローラー",
+        passives:[{name:"天才のひらめき",desc:"アルティメット促進剤で即フルチャージされる。促進剤を多く携行でき、シールドも少しずつ回復する"}],
+        tactical:{name:"周辺セキュリティ",desc:"ノードを繋いで電気フェンスを作る。触れた敵にダメージと移動速度低下を与える"},
+        ultimate:{name:"インターセプターパイロン",desc:"飛来する軍需品を破壊しシールドを修復する電気パイロンを設置する（最大3基）"},
+        perks:[{tier:"LV2",options:[{name:"ヘルプイズヒア",desc:"サポート用ボックスが利用でき、復活が強化され、デスボックスからMRBが出現する"},{name:"究極電導体",desc:"敵にダメージを与えるとアルティメットのクールダウンが短縮し、ノックダウンで50%のチャージを獲得する"}]},{tier:"LV3",options:[{name:"エネルギーヒーラー",desc:"注射器とシールドセルの回復量が2倍になる"},{name:"パワーパイロン",desc:"アルティメットのHP・最大容量・シールドのリチャージ速度が2倍になる"}]}]},
+      {id:"crypto",name:"クリプト",role:"リーコン",
+        passives:[{name:"リコン",desc:"調査ビーコンをスキャンし、次のリングの場所を特定する"},{name:"ニューロリンク",desc:"クリプトと味方はスパイドローンが検知したものを確認できる"}],
+        tactical:{name:"スパイドローン",desc:"空中カメラ付きドローンを展開する。破壊されると40秒のクールダウンが必要"},
+        ultimate:{name:"ドローンEMP",desc:"ドローンからEMPを発射し、シールドにダメージを与えつつ敵の動きを遅らせ罠を破壊する"},
+        perks:[{tier:"LV2",options:[{name:"ネットワークエクスパンション",desc:"ニューロリンクとEMPの効果範囲が25%拡大する"},{name:"Ally.MoveTo[]",desc:"味方にトラッカーを付与し、その位置へ素早く移動できるようになる"}]},{tier:"LV3",options:[{name:"エネルギー結合",desc:"ビーコンの使用やドローンで敵をスキャンするとアルティメットのチャージを獲得する"},{name:"ハッカソン",desc:"ドローンのリチャージ速度が上昇し、EMPや破壊時の爆発で移動速度をブーストする"}]}]},
+      {id:"revenant",name:"レヴナント",role:"アサルト",
+        passives:[{name:"アサシンの本能",desc:"付近の体力が低い敵を強調表示する。しゃがみ移動と壁上りが強化される"}],
+        tactical:{name:"シャドウパウンス",desc:"前方に飛びかかる。長押しでチャージ可能。ウルト中に敵をノックダウンするとクールタイムがリセットされる"},
+        ultimate:{name:"フォージシャドウ",desc:"周囲に影を作り出し、直接ダメージを一定量防ぐ。ヒットボックスは大きくなる"},
+        perks:[{tier:"LV2",options:[{name:"アルティメットクールダウン",desc:"アルティメットのクールダウンが30秒短縮する"},{name:"トライトゥハイド",desc:"体力の低い敵をマークする持続時間が2倍になる"}]},{tier:"LV3",options:[{name:"戦術クールダウン",desc:"戦術アビリティのクールダウンが5秒短縮する"},{name:"アジャイルアサシン",desc:"シャドウパウンスの飛びかかりとチャージ時間を50%短縮する"}]}]},
+      {id:"loba",name:"ローバ",role:"サポート",
+        passives:[{name:"アイフォークオリティ",desc:"付近のスーパーレア・レジェンダリーアイテムを壁越しに見ることができる"}],
+        tactical:{name:"盗賊の相棒",desc:"ブレスレットを投げてテレポートし、たどり着きづらい場所へ移動したり窮地を脱したりできる"},
+        ultimate:{name:"ブラックマーケット",desc:"付近のアイテムをインベントリへテレポートさせるデバイスを設置する。各レジェンドは最大2個回収できる"},
+        perks:[{tier:"LV2",options:[{name:"ウルフクロー",desc:"テレポート後に武器を構える速度と移動速度が上昇する"},{name:"爆買い",desc:"部隊がブラックマーケットから追加でアイテムを受け取ることができる"}]},{tier:"LV3",options:[{name:"エスケープアーティスト",desc:"テレポート後にシールドが自動で25回復する"},{name:"ブランニューバッグ",desc:"選択すると部隊全体に紫のバックパックが付与される"}]}]},
+      {id:"rampart",name:"ランパート",role:"コントローラー",
+        passives:[{name:"改造ローダー",desc:"LMGやミニガン使用時に装弾数が増加し、高速リロードが可能になる"}],
+        tactical:{name:"増幅バリケード",desc:"遮蔽物を設置すると全体を覆うバリケードが出現し、外側からの銃弾をブロックしつつ内側からの攻撃を強化する"},
+        ultimate:{name:"モバイルミニガン「シーラ」",desc:"大容量マガジンのモバイルミニガンを装備。設置すればリロード可能な固定タレットとしても使用できる"},
+        perks:[{tier:"LV2",options:[{name:"コンバット・リザーブ",desc:"スタックごとの追加弾薬・追加グレネードスロット・ストウリロードを獲得する"},{name:"臨戦態勢",desc:"増幅バリケードの後ろにいるとリロード速度が上昇し、無限弾薬を得る"}]},{tier:"LV3",options:[{name:"ランプアップ",desc:"モバイルシーラの取り回しとスピンアップ時間が20%改善する"},{name:"再構築モジュール",desc:"増幅バリケードは一定時間ダメージを受けなければ自動回復する"}]}]},
+      {id:"horizon",name:"ホライゾン",role:"スカーミッシャー",
+        passives:[{name:"スペースウォーク",desc:"独自の宇宙服により空中制御が向上し、落下の衝撃が抑制される"}],
+        tactical:{name:"グラビティリフト",desc:"重力の流れを逆転させてプレイヤーを持ち上げ、脱出時にブーストをかける"},
+        ultimate:{name:"ブラックホール",desc:"ニュートを展開し、プレイヤーを引き寄せる極小のブラックホールを発生させる"},
+        perks:[{tier:"LV2",options:[{name:"グラビティブーツ",desc:"空中でしゃがみボタンを押すと落下速度が上昇する"},{name:"ニュート・スクート",desc:"グラビティリフトを離れた後、空中で入力すると落下速度が大幅に低下する"}]},{tier:"LV3",options:[{name:"エネルギー保存",desc:"パッシブでの軟着地時にシールドが25回復する"},{name:"ノックエキスパート",desc:"ノックダウン時に追加でアビリティをチャージする"}]}]},
+      {id:"fuse",name:"ヒューズ",role:"アサルト",
+        passives:[{name:"グレネーダー",desc:"各スロットでグレネードを1個多く所有できる。遠くへ素早く正確に投擲可能"}],
+        tactical:{name:"ナックルクラスター",desc:"着弾時に空中炸裂式の爆発物を連続射出するクラスター爆弾を発射する"},
+        ultimate:{name:"マザーロード",desc:"一帯を炎の壁で包み込む爆撃を行う"},
+        perks:[{tier:"LV2",options:[{name:"パイロテクニック",desc:"アルティメットの爆発で8秒間炎を発生させる"},{name:"ナックルジャンパー",desc:"戦術の近くでジャンプするとブーストを獲得し、クールダウンが50%回復する"}]},{tier:"LV3",options:[{name:"リイグニッション",desc:"爆発ダメージを2回与えるたびにアルティメットのクールダウンが1秒回復する"},{name:"レックレス",desc:"爆発ダメージを50%軽減する"}]}]},
+      {id:"valkyrie",name:"ヴァルキリー",role:"リーコン",
+        passives:[{name:"リコン",desc:"調査ビーコンをスキャンし、次のリングの場所を特定する"},{name:"VTOLジェット",desc:"一時的に空中浮遊・飛行が可能。燃料切れまで持続し、約8秒で再チャージされる"}],
+        tactical:{name:"ミサイルスワーム",desc:"複数のミサイルを発射し、敵にダメージとスロウ効果を与える"},
+        ultimate:{name:"スカイワードダイブ",desc:"素早く空高く飛び上がり、頂点からは滑空飛行に移行する。味方も同時に飛び上がれる"},
+        perks:[{tier:"LV2",options:[{name:"アイズ・イン・ザ・スカイ",desc:"スカイダイブ中により遠くから、壁越しに敵の位置が明らかになる"},{name:"フルカバー",desc:"戦術のクールダウンが5秒短縮し、ミサイルスワームのパターンが4×3から4×5に変わる"}]},{tier:"LV3",options:[{name:"スーパーソニック",desc:"アルティメットでのプレイヤーの離陸が速くなる"},{name:"エアリアルエキスパート",desc:"ジェットパックの起動コストが低下し水平速度が上昇する。燃料消費はやや増加する"}]}]},
+      {id:"seer",name:"シア",role:"リーコン",
+        passives:[{name:"リコン",desc:"調査ビーコンをスキャンし、次のリングの場所を特定する"},{name:"ハートシーカー",desc:"ADS中、一定範囲内の敵の心拍を捉えて視覚化する"}],
+        tactical:{name:"フォーカスオブアテンション",desc:"ミニドローンで前方の敵の位置とHPを味方全員へ知らせ、回復・蘇生を中断させる"},
+        ultimate:{name:"ショーケース",desc:"球状のドームを展開し、素早く動く敵や発砲した敵の位置と足跡を検知する"},
+        perks:[{tier:"LV2",options:[{name:"ラスティングビート",desc:"アルティメット範囲外へ移動した敵の位置が5秒間表示される"},{name:"エナジャイズフォーカス",desc:"戦術アビリティを発動するとシールドが自動回復する"}]},{tier:"LV3",options:[{name:"ホームベース",desc:"ショーケースの効果範囲内で戦術のリチャージ速度が大幅に上昇する"},{name:"スプリットフォーカス",desc:"フォーカスオブアテンションのチャージを獲得する"}]}]},
+      {id:"ash",name:"アッシュ",role:"スカーミッシャー",
+        passives:[{name:"死の烙印",desc:"マップ上にデスボックスの場所が示され、生存しているアタッカーをマークできる"}],
+        tactical:{name:"アークスネア",desc:"回転するスネアを投げ、最初に近づいた敵にダメージと拘束を与える"},
+        ultimate:{name:"フェーズティア",desc:"狙った場所に一方通行のポータルを開く"},
+        perks:[{tier:"LV2",options:[{name:"アルティメットクールダウン",desc:"アルティメットのクールダウンが30秒短縮する"},{name:"ロングリーチ",desc:"アルティメットの効果範囲が25m延長する"}]},{tier:"LV3",options:[{name:"ツインスネア",desc:"アークスネアのチャージを1つ獲得する"},{name:"グリーディースネア",desc:"アークスネアの効果時間が3倍になり複数の敵を拘束できる"}]}]},
+      {id:"maggie",name:"マッド・マギー",role:"アサルト",
+        passives:[{name:"ウォーロードの怒り",desc:"ダメージを与えた敵を一時的に可視化し、ショットガン携行時は移動速度が上昇する"}],
+        tactical:{name:"ライオットドリル",desc:"障害物を突破して敵を焼き払うドリルを放つ"},
+        ultimate:{name:"レッカーボール",desc:"スピードブーストパッドを設置し、敵の近くで爆発するボールを投げる"},
+        perks:[{tier:"LV2",options:[{name:"ガンランニング",desc:"SMGとピストル携行時にもパッシブの移動速度上昇が適用される"},{name:"ファイアボール",desc:"レッカーボールが線状にマグマを落とし、炎ダメージを50%軽減する"}]},{tier:"LV3",options:[{name:"ドリルスリンガー",desc:"ライオットドリルのチャージを1つ獲得するが効果時間が25%短縮する"},{name:"ビッグドリル",desc:"戦術の深さ・幅が50%増加する"}]}]},
+      {id:"newcastle",name:"ニューキャッスル",role:"サポート",
+        passives:[{name:"傷兵警護",desc:"倒れた味方を引きずりながら蘇生し、蘇生シールドで守る"}],
+        tactical:{name:"モバイルプロテクター",desc:"操作可能なドローンを投げて移動式エネルギーシールドを生成する"},
+        ultimate:{name:"キャッスルウォール",desc:"味方や標的のエリアへ突撃し、要塞化された壁を築き上げる"},
+        perks:[{tier:"LV2",options:[{name:"ストロングホールド",desc:"キャッスルウォールのHPが500増加し、エネルギーバリケードの効果時間が4分に増加する"},{name:"レディー・トゥ・ランブル",desc:"味方を蘇生するとすべての武器をリロードし完全に回復する"}]},{tier:"LV3",options:[{name:"究極の救世主",desc:"キャッスルウォールを叩きつけると15秒間、範囲内の味方全員にシールドの自動回復が付与される"},{name:"防衛線",desc:"戦術・パッシブのシールドが最初に近づいた敵を撃退する"}]}]},
+      {id:"vantage",name:"ヴァンテージ",role:"リーコン",
+        passives:[{name:"リコン",desc:"調査ビーコンをスキャンし、次のリングの場所を特定する"},{name:"スポッターレンズ",desc:"エイム中に周囲を偵察でき、着弾予測地点を確認できる"}],
+        tactical:{name:"エコー配置",desc:"翼を持つコンパニオン「エコー」を配置し、そこへ向かって飛んでいく"},
+        ultimate:{name:"スナイパーズマーク",desc:"敵をマークし、自分とチームにダメージボーナスを与える"},
+        perks:[{tier:"LV2",options:[{name:"コントロールマイプレイ",desc:"リングコンソールへのアクセスとゾーンオーバーチャージを獲得する"},{name:"インプルーブマーク",desc:"スナイパーズマークが壁越しに見え、マークした敵を短時間ハイライトしてチームが体力を確認できる"}]},{tier:"LV3",options:[{name:"集団追跡",desc:"スポッターレンズのピンで部隊全体を追跡する"},{name:"スナイパーカバー",desc:"アルティメットのスナイパーにガンシールドを装着する"}]}]},
+      {id:"catalyst",name:"カタリスト",role:"コントローラー",
+        passives:[{name:"バリケード",desc:"長押しでドアを増強できる。増強されたドアは耐久力が上がり敵は開けられなくなる"}],
+        tactical:{name:"スパイクストリップ",desc:"敵が近づくとスパイクに変化する磁性流体を投げる。触れた敵はダメージと速度低下を受ける"},
+        ultimate:{name:"フェロバリケード",desc:"磁性流体の壁を作る。通った敵は速度低下と視界不良になり、スキャンもブロックできる"},
+        perks:[{tier:"LV2",options:[{name:"ソールピアサー",desc:"起動速度が上昇しダメージが増加する"},{name:"ヒドゥンスパイク",desc:"設置したスパイクが表示されなくなる"}]},{tier:"LV3",options:[{name:"フェロドア",desc:"破壊されたドアを修復・強化する"},{name:"レジリエントベール",desc:"アルティメットの効果時間が5秒増加する"}]}]},
+      {id:"ballistic",name:"バリスティック",role:"アサルト",
+        passives:[{name:"スリング",desc:"3本目の武器を所持できる（アタッチメントは付けられない）"}],
+        tactical:{name:"ウィスラー",desc:"敵の武器をロックオンしてオーバーヒートさせ、ダメージを与える"},
+        ultimate:{name:"テンペスト",desc:"自分と近くの味方に弾薬無限・リロード速度上昇などの効果を付与する"},
+        perks:[{tier:"LV2",options:[{name:"追加バレット",desc:"戦術のチャージを追加で1つ獲得する"},{name:"トラップモード",desc:"トラップのダメージが増加し持続時間が長くなる"}]},{tier:"LV3",options:[{name:"静かな時間",desc:"武器がオーバーヒートしなくなる代わりにサイレンス状態になり、戦術のクールダウンが長くなる"},{name:"キリングタイム",desc:"アルティメットの持続時間が15秒増加する"}]}]},
+      {id:"conduit",name:"コンジット",role:"サポート",
+        passives:[{name:"セイバースピード",desc:"戦術アビリティの範囲外にいる仲間に向かって走るとスピードがブーストされる"}],
+        tactical:{name:"レイディアントトランスファー",desc:"仲間にエネルギーを放出し、危機に陥った仲間と自分に一時的なシールドを生成する"},
+        ultimate:{name:"エネルギーバリケード",desc:"敵にダメージを与えて動きを鈍らせるジャミングデバイスの一団を展開する"},
+        perks:[{tier:"LV2",options:[{name:"バットパック",desc:"シールドバッテリーのスタック上限が1増加し、デスボックスに数が表示される"},{name:"ビガージャム",desc:"各アルティメットジャマーのダメージ半径が10%拡大する"}]},{tier:"LV3",options:[{name:"即時バリケード",desc:"一時シールドの一部を即座に獲得するが再生時間が短縮される"},{name:"永続バリケード",desc:"一時シールドの再生がダメージを受けても持続する"}]}]},
+      {id:"alter",name:"オルター",role:"スカーミッシャー",
+        passives:[{name:"リフトの贈り物",desc:"デスボックスを遠隔操作してアイテムを1つ入手できる（シールドコアは不可）"}],
+        tactical:{name:"ヴォイドパッセージ",desc:"物体を通り抜けられるポータルを作成する。どちらの方向からも通行できる"},
+        ultimate:{name:"ヴォイドネクサス",desc:"全員が遠隔操作できる合流ポイントを作成し、フェーズトンネルで移動できる"},
+        perks:[{tier:"LV2",options:[{name:"別世界の目",desc:"調査ビーコンへのアクセスを獲得し、エイム時に敵を強調表示する"},{name:"ワールドコントローラー",desc:"リングコンソールへのアクセス、ゾーンオーバーチャージ、硬質光メッシュの強化を獲得する"}]},{tier:"LV3",options:[{name:"ヴォイド観測者",desc:"ヴォイドパッセージのポータルのスキャンを15秒延長する"},{name:"ヴォイドブリーチャー",desc:"ヴォイドパッセージで移動すると味方の移動速度と武器の取り回しが強化される"}]}]},
+      {id:"axle",name:"アクセル",role:"スカーミッシャー",
+        passives:[{name:"ドリフト",desc:"スライディング時の機動性と操作性が向上し、移動距離も延びる"}],
+        tactical:{name:"ニトロゲート",desc:"設置型のスピードゲートを展開する。踏んだプレイヤーは高速ブーストスライド状態になる（敵も使用可）"},
+        ultimate:{name:"キックスタート",desc:"前方に敵を追尾するドローンを発射する。命中した敵は空中へ打ち上げられる"},
+        perks:[{tier:"LV2",options:[{name:"スライディングシューター",desc:"スライディング中の射撃はマガジンではなくインベントリから直接弾薬を消費する"},{name:"ロングホール",desc:"ニトロゲートが強化され、ブーストスライドの最大持続時間が2秒延長される"}]},{tier:"LV3",options:[{name:"ジャンプゲート",desc:"ニトロゲートが強化され、ダブルジャンプが可能になる"},{name:"スーパースライダー",desc:"戦術のクールダウンが5秒短縮し、最大展開数が1増加する"}]}]},
+      {id:"sparrow",name:"スパロー",role:"リーコン",
+        passives:[{name:"ダブルジャンプ",desc:"空中で追加のジャンプを行える"}],
+        tactical:{name:"トラッカードローン",desc:"矢を放ち命中させると、着弾地点から半径20m以内の敵を壁越しにスキャンしてシルエットを一定時間表示する"},
+        ultimate:{name:"スティンガーボルト",desc:"命中した敵に継続ダメージとスロウ効果を与える矢を放つ。周囲の敵をスキャンする効果もある"},
+        perks:[{tier:"LV2",options:[{name:"ハントターゲット",desc:"マークした敵の方向へ移動するとスパローの移動速度が上昇する"},{name:"エクストラトラップ",desc:"戦術のチャージ上限が1増加し、最大設置数も2増加する"}]},{tier:"LV3",options:[{name:"ライフサイフォン",desc:"アルティメットで敵プレイヤーにダメージを与えると、自身の体力とシールドが少量回復する"},{name:"オルタネイトモード",desc:"アルティメットが3回チャージできるようになるが、効果範囲が縮小しパルスの発射回数も減少する"}]}]},
+    ],
+    patches:[
+      {ver:"S30 Marked",date:"2026-08-04",title:"新シーズン「Marked」開幕、ブラッドハウンド大型リワーク",lines:[
+        {t:"buff",rid:"bloodhound",target:"ブラッドハウンド",text:"パッシブ・戦術・アルティメットすべてを刷新する大型リワークを実施。新アルティメット「オールファーザーのクローク」を実装",mag:3},
+        {t:"buff",rid:"rampart",target:"ランパート",text:"設置武器まわりの性能をさらに強化",mag:2},
+        {t:"nerf",rid:"seer",target:"シア",text:"タクティカルの発動頻度をさらに抑制する調整",mag:2},
+        {t:"change",rid:null,target:"ワールズエッジ",text:"マップの一部エリアをリワーク"},
+      ]},
+      {ver:"S29 中間",date:"2026-06-23",title:"Overclocked中間アップデート、コンジット弱体化",lines:[
+        {t:"nerf",rid:"conduit",target:"コンジット",text:"台頭しすぎたサポート性能を抑制する大幅弱体化",mag:3},
+        {t:"change",rid:null,target:"ショットガン用ホップアップ",text:"新しいアタッチメントを追加"},
+      ]},
+      {ver:"S29 Overclocked",date:"2026-05-05",title:"新シーズン「Overclocked」開幕、新レジェンド参戦",lines:[
+        {t:"new",rid:null,target:"新レジェンド「アクスル」",text:"サポート系レジェンドとして参戦"},
+        {t:"buff",rid:"conduit",target:"コンジット",text:"回復・シールド供給まわりのサポート性能を強化",mag:2},
+      ]},
+      {ver:"S28",date:"2026-02-10",title:"新シーズン開幕、リーコン系レジェンドを調整",lines:[
+        {t:"buff",rid:"bloodhound",target:"ブラッドハウンド",text:"偵察スキルの索敵範囲をわずかに拡大",mag:1},
+        {t:"change",rid:null,target:"フューズ／カタリスト",text:"アビリティ性能を調整"},
+      ]},
+      {ver:"S27 中間",date:"2026-01-06",title:"中間アップデート、オクタンをリワーク",lines:[
+        {t:"change",rid:null,target:"オクタン",text:"機動系アビリティをリワーク"},
+        {t:"change",rid:null,target:"ニューカッスル／クリプト",text:"アビリティを調整"},
+      ]},
+      {ver:"S27 Amped",date:"2025-11-04",title:"新シーズン開幕、ピック率てこ入れの調整",lines:[
+        {t:"buff",rid:"horizon",target:"ホライゾン",text:"空中機動性能を強化しピック率をてこ入れ",mag:2},
+        {t:"buff",rid:"rampart",target:"ランパート",text:"設置系ギアの展開速度を改善",mag:1},
+        {t:"change",rid:null,target:"オリンパス",text:"新エリア追加とレイアウト変更"},
+      ]},
+      {ver:"S26 中間",date:"2025-09-16",title:"中間アップデート、マッド・マギーとシアを強化",lines:[
+        {t:"buff",rid:"maggie",target:"マッド・マギー",text:"タクティカルの起動と貫通性能を改善し扱いやすく",mag:2},
+        {t:"buff",rid:"seer",target:"シア",text:"タクティカル／アルティメットの索敵性能を大幅強化",mag:3},
+      ]},
+    ],
+    weapons:[
+      {id:"r301",name:"R-301カービン",category:"アサルトライフル",hopup:{name:"アンヴィルレシーバー",desc:"ADS（照準）中に命中させると追加ダメージが発生する"}},
+      {id:"flatline",name:"フラットライン",category:"アサルトライフル",hopup:{name:"アンヴィルレシーバー",desc:"ADS（照準）中に命中させると追加ダメージが発生する"}},
+      {id:"hemlok",name:"ヘムロック",category:"アサルトライフル"},
+      {id:"nemesis",name:"ネメシス",category:"アサルトライフル"},
+      {id:"havoc",name:"ハボック",category:"アサルトライフル",hopup:{name:"ターボチャージャー",desc:"スピンアップ時間を短縮し、素早くフル火力に到達できるようにする"}},
+      {id:"r99",name:"R-99",category:"サブマシンガン"},
+      {id:"volt",name:"ヴォルト",category:"サブマシンガン"},
+      {id:"car",name:"C.A.R.",category:"サブマシンガン"},
+      {id:"alternator",name:"オルタネーター",category:"サブマシンガン",hopup:"ダブルタップトリガー"},
+      {id:"prowler",name:"プラウラー",category:"サブマシンガン",hopup:"セレクトファイア"},
+      {id:"spitfire",name:"スピットファイア",category:"ライトマシンガン",hopup:"ブースティッドローダー"},
+      {id:"devotion",name:"デヴォーション",category:"ライトマシンガン",hopup:"ターボチャージャー"},
+      {id:"rampage",name:"ランページ",category:"ライトマシンガン"},
+      {id:"lstar",name:"L-STAR",category:"ライトマシンガン"},
+      {id:"repeater",name:"30-30リピーター",category:"マークスマンライフル",hopup:"キネティックフィーダー"},
+      {id:"g7scout",name:"G7スカウト",category:"マークスマンライフル"},
+      {id:"bocek",name:"ボセックボウ",category:"マークスマンライフル"},
+      {id:"longbow",name:"ロングボウ",category:"スナイパーライフル",hopup:"デッドアイズテンポ"},
+      {id:"sentinel",name:"センチネル",category:"スナイパーライフル"},
+      {id:"kraber",name:"クレーバー",category:"スナイパーライフル"},
+      {id:"mastiff",name:"マスティフ",category:"ショットガン",hopup:"デュアルシェル"},
+      {id:"eva8",name:"EVA-8",category:"ショットガン"},
+      {id:"peacekeeper",name:"ピースキーパー",category:"ショットガン",hopup:"プレシジョンチョーク"},
+      {id:"mozambique",name:"モザンビーク",category:"ショットガン",hopup:"シャッターキャップ"},
+      {id:"p2020",name:"P2020",category:"ピストル",hopup:"ハンマーポイントロウンズ"},
+      {id:"re45",name:"RE-45",category:"ピストル"},
+      {id:"wingman",name:"ウィングマン",category:"ピストル"},
+    ],
+    weaponPatches:[
+      {ver:"S30 Marked",date:"2026-08-04",title:"新シーズン武器調整、ケアパッケージ武器を入れ替え",lines:[
+        {t:"nerf",wid:"hemlok",target:"ヘムロック",text:"全体的なダメージを下方修正",mag:2},
+        {t:"nerf",wid:"re45",target:"RE-45",text:"命中精度と反動を弱体化",mag:1},
+        {t:"nerf",wid:"alternator",target:"オルタネーター",text:"オーバーパフォーマンスを受けて弱体化",mag:2},
+        {t:"nerf",wid:"r99",target:"R-99",text:"近距離火力の高さを是正する弱体化",mag:2},
+        {t:"nerf",wid:"g7scout",target:"G7スカウト",text:"ケアパッケージ落選に伴い通常武器仕様へ弱体化",mag:1},
+        {t:"buff",wid:"repeater",target:"30-30リピーター",text:"ケアパッケージ入りに伴い大幅強化",mag:3},
+        {t:"buff",wid:"mozambique",target:"モザンビーク",text:"新ホップアップ「シャッターキャップ」を追加。腰だめ時に弾が拡散し1射撃7ペレットのショットガン運用が可能に",mag:2},
+      ]},
+      {ver:"S29 中間",date:"2026-06-23",title:"専用ホップアップの再配分、ネメシスに新ホップアップ追加",lines:[
+        {t:"nerf",wid:"longbow",target:"ロングボウ",text:"専用ホップアップ「デッドアイズテンポ」を取り外し",mag:1},
+        {t:"nerf",wid:"wingman",target:"ウィングマン",text:"専用ホップアップ「スカルピアサー」を取り外し",mag:1},
+        {t:"nerf",wid:"mozambique",target:"モザンビーク",text:"専用ホップアップ「ハンマーポイントロウンズ」を取り外し",mag:1},
+        {t:"buff",wid:"flatline",target:"フラットライン",text:"専用ホップアップ「アンヴィルレシーバー」を追加",mag:1},
+        {t:"buff",wid:"volt",target:"ヴォルト",text:"マガジン容量を増加",mag:1},
+        {t:"buff",wid:"nemesis",target:"ネメシス",text:"新ホップアップ「ターボチャージャー」を追加。2バースト後にフルオート化する「ターボネメシス」が使用可能に",mag:2},
+      ]},
+      {ver:"S29 Overclocked",date:"2026-05-05",title:"新シーズン開幕、ライトアモ武器全体を抑制",lines:[
+        {t:"change",wid:null,target:"ライトアモ武器全般",text:"所持数の上限を72発から60発に減少し、クラス全体の持続力を抑制"},
+      ]},
+    ]
+  }
+};
+
+let current = "apex";
+let selectedChar = {};
+let selectedClass = {};
+let activeTab = {};
+let selectedWeaponCat = {};
+let selectedWeapon = {};
+let newGameCount = 0;
+
+function meterHtml(line){
+  if(line.t==="buff" || line.t==="nerf"){
+    const mag = line.mag||1;
+    return `<div class="meter-track"><div class="meter-fill ${line.t} m${mag}"></div></div>`;
+  }
+  const color = line.t==="change" ? "var(--change)" : "var(--new)";
+  return `<div class="meter-dot"><span style="background:${color}"></span></div>`;
+}
+
+/* ---------- class-based silhouette icons ---------- */
+const CLASS_COLORS = {
+  "アサルト": "#e2704f",
+  "スカーミッシャー": "#5fa8d3",
+  "リーコン": "#6fbf8b",
+  "コントローラー": "#b98ce0",
+  "サポート": "#e0ab58",
+};
+const CLASS_ORDER = ["アサルト","スカーミッシャー","リーコン","コントローラー","サポート"];
+const CLASS_ICONS = {
+  "リーコン": (c,s)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12c2.5-4 6-6 10-6s7.5 2 10 6c-2.5 4-6 6-10 6s-7.5-2-10-6z"/><circle cx="12" cy="12" r="2.4" fill="${c}" stroke="none"/></svg>`,
+  "コントローラー": (c,s)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3" fill="${c}" stroke="none"/></svg>`,
+  "サポート": (c,s)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="${c}" stroke="none"><path d="M10 3h4v6h6v4h-6v6h-4v-6H4v-4h6z"/></svg>`,
+  "アサルト": (c,s)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8"><circle cx="12" cy="12" r="7"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>`,
+  "スカーミッシャー": (c,s)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="${c}" stroke="none"><polygon points="13,2 5,14 11,14 9,22 19,9 13,9"/></svg>`,
+};
+function classAvatarHtml(role, px){
+  const color = CLASS_COLORS[role] || "#8b93a3";
+  const gen = CLASS_ICONS[role] || CLASS_ICONS["アサルト"];
+  const iconSize = Math.round(px*0.56);
+  const icon = gen(color, iconSize);
+  return `<div class="avatar" style="background:${color}22;width:${px}px;height:${px}px;">${icon}</div>`;
+}
+
+const WEAPON_CAT_COLORS = {
+  "アサルトライフル": "#e2704f",
+  "サブマシンガン": "#5fa8d3",
+  "ライトマシンガン": "#b98ce0",
+  "マークスマンライフル": "#e0ab58",
+  "スナイパーライフル": "#6fbf8b",
+  "ショットガン": "#e0577a",
+  "ピストル": "#8b93a3",
+};
+const WEAPON_CAT_ORDER = ["アサルトライフル","サブマシンガン","ライトマシンガン","マークスマンライフル","スナイパーライフル","ショットガン","ピストル"];
+const WEAPON_CAT_ICONS = {
+  "アサルトライフル": (c,s)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8"><circle cx="12" cy="12" r="7"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>`,
+  "サブマシンガン": (c,s)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round"><line x1="5" y1="19" x2="10" y2="5"/><line x1="10" y1="19" x2="15" y2="5"/><line x1="15" y1="19" x2="20" y2="5"/></svg>`,
+  "ライトマシンガン": (c,s)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3l7 3v6c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6l7-3z"/></svg>`,
+  "マークスマンライフル": (c,s)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.2"/></svg>`,
+  "スナイパーライフル": (c,s)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8"><circle cx="12" cy="12" r="5"/><line x1="12" y1="0" x2="12" y2="7"/><line x1="12" y1="17" x2="12" y2="24"/><line x1="0" y1="12" x2="7" y2="12"/><line x1="17" y1="12" x2="24" y2="12"/></svg>`,
+  "ショットガン": (c,s)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="${c}" stroke="none"><circle cx="12" cy="12" r="1.6"/><circle cx="6" cy="6" r="1.3"/><circle cx="18" cy="6" r="1.3"/><circle cx="4" cy="15" r="1.3"/><circle cx="20" cy="15" r="1.3"/><circle cx="9" cy="20" r="1.3"/><circle cx="15" cy="20" r="1.3"/></svg>`,
+  "ピストル": (c,s)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.6" fill="${c}" stroke="none"/></svg>`,
+};
+function weaponAvatarHtml(category, px){
+  const color = WEAPON_CAT_COLORS[category] || "#8b93a3";
+  const gen = WEAPON_CAT_ICONS[category] || WEAPON_CAT_ICONS["アサルトライフル"];
+  const iconSize = Math.round(px*0.56);
+  const icon = gen(color, iconSize);
+  return `<div class="avatar" style="background:${color}22;width:${px}px;height:${px}px;">${icon}</div>`;
+}
+
+function renderSidebar(){
+  const list = document.getElementById('gameList');
+  list.innerHTML = '';
+  Object.keys(DATA).forEach(key=>{
+    const g = DATA[key];
+    const div = document.createElement('div');
+    div.className = 'game-item' + (key===current ? ' active' : '');
+    div.onclick = () => { current = key; render(); };
+    const metaText = g.patches.length ? `最終更新 ${g.updated}` : '未登録';
+    div.innerHTML = `
+      ${iconHtml(g.icon, g.color, 'g-icon')}
+      <div class="g-text">
+        <div class="g-name">${g.name}</div>
+        <div class="g-meta">${metaText}</div>
+      </div>`;
+    list.appendChild(div);
+  });
+}
+
+function renderRoster(g){
+  if(g.roster.length===0) return '';
+  const classSel = selectedClass[current];
+  const list = classSel ? g.roster.filter(r=>r.role===classSel) : g.roster;
+  const sel = selectedChar[current];
+  const selItem = sel ? g.roster.find(r=>r.id===sel) : null;
+  const chips = list.map(r=>{
+    const active = sel===r.id ? ' active' : '';
+    const c = CLASS_COLORS[r.role] || g.color;
+    return `
+      <div class="roster-chip${active}" data-rid="${r.id}" style="${active ? '' : `border-left-color:${c}`}">
+        ${classAvatarHtml(r.role, 26)}
+        <div>
+          <div class="r-name">${r.name}</div>
+          <div class="r-role">${r.role}</div>
+        </div>
+      </div>`;
+  }).join('');
+  const allActive = !sel ? ' active' : '';
+  return `
+    <div class="roster-header">
+      <div class="filter-flyout primary${sel?' has-sel':''}" style="--tab-color:${g.color}" tabindex="0">
+        <button type="button" class="filter-trigger primary">${selItem ? selItem.name : `${g.rosterLabel}を選択`}<span class="car">▾</span></button>
+        <div class="filter-panel grid">
+          <div class="roster-chip all${allActive}" data-rid="">すべて表示</div>
+          ${chips}
+        </div>
+      </div>
+    </div>
+    ${classTabsHtml(g)}`;
+}
+
+function renderTimeline(patches){
+  const filters = ['buff','nerf','change','new'].map(t=>{
+    const c = {buff:'var(--buff)',nerf:'var(--nerf)',change:'var(--change)',new:'var(--new)'}[t];
+    return `<div class="chip"><span class="sw" style="background:${c}"></span>${LABEL[t]}</div>`;
+  }).join('');
+
+  const entries = patches.map(p=>{
+    const lines = p.lines.map(l=>{
+      const sym = SYM[l.t];
+      const targetHtml = l.target ? `<span class="target">${l.target}</span> — ` : '';
+      return `<div class="diff-line ${l.t}"><span class="diff-sym">${sym}</span><span class="body">${targetHtml}${l.text}</span>${meterHtml(l)}</div>`;
+    }).join('');
+    return `
+      <div class="entry">
+        <div class="entry-head"><span class="ver">${p.ver}</span><span class="date">${p.date}</span></div>
+        <div class="entry-title">${p.title}</div>
+        ${lines}
+      </div>`;
+  }).join('');
+
+  return `<div class="filters">${filters}</div>${entries}`;
+}
+
+function sectionTabsHtml(g){
+  if(!g.weapons || g.weapons.length===0) return '';
+  const tab = activeTab[current] || 'legends';
+  return `
+    <div class="section-toggle">
+      <button class="sec-tab${tab==='legends'?' active':''}" data-sec="legends">レジェンド</button>
+      <button class="sec-tab${tab==='weapons'?' active':''}" data-sec="weapons">武器</button>
+    </div>`;
+}
+
+function renderWeaponRoster(g){
+  const catSel = selectedWeaponCat[current];
+  const list = catSel ? g.weapons.filter(w=>w.category===catSel) : g.weapons;
+  const sel = selectedWeapon[current];
+  const selItem = sel ? g.weapons.find(w=>w.id===sel) : null;
+  const chips = list.map(w=>{
+    const active = sel===w.id ? ' active' : '';
+    const c = WEAPON_CAT_COLORS[w.category] || g.color;
+    return `
+      <div class="roster-chip${active}" data-wid="${w.id}" style="${active ? '' : `border-left-color:${c}`}">
+        ${weaponAvatarHtml(w.category, 26)}
+        <div>
+          <div class="r-name">${w.name}</div>
+          <div class="r-role">${w.category}${w.hopup ? ` ・ ${w.hopup}` : ''}</div>
+        </div>
+      </div>`;
+  }).join('');
+  const allActive = !sel ? ' active' : '';
+  return `
+    <div class="roster-header">
+      <div class="filter-flyout primary${sel?' has-sel':''}" style="--tab-color:${g.color}" tabindex="0">
+        <button type="button" class="filter-trigger primary">${selItem ? selItem.name : `${g.weaponsLabel}を選択`}<span class="car">▾</span></button>
+        <div class="filter-panel grid">
+          <div class="roster-chip all${allActive}" data-wid="">すべて表示</div>
+          ${chips}
+        </div>
+      </div>
+    </div>
+    ${weaponCatTabsHtml(g)}`;
+}
+
+const HOPUP_DESC = {
+  "アンヴィルレシーバー":"ADS（照準）中に命中させた一発のダメージが増加する",
+  "ターボチャージャー":"溜め動作（スピンアップ）なしで即座に最大威力を発揮できる",
+  "ダブルタップトリガー":"トリガーを引くと弾が2発同時に発射される",
+  "セレクトファイア":"バースト射撃からフルオート射撃に切り替えられる",
+  "ブースティッドローダー":"リロード速度が大幅に上昇する",
+  "キネティックフィーダー":"撃っていない間、自動でマガジンに弾薬が補充される",
+  "デッドアイズテンポ":"命中を重ねるごとに連射速度が上昇していく",
+  "デュアルシェル":"一度に2発を装填でき、リロードの手間が減る",
+  "プレシジョンチョーク":"ADS中に弾の広がりが収束し、集弾率が上がる",
+  "シャッターキャップ":"腰だめ射撃時に弾が拡散し、1回の発射で7発のペレットを放てるようになる",
+  "ハンマーポイントロウンズ":"手足や胴体へのダメージが増加し、部位ごとのダメージ差が小さくなる",
+};
+
+function renderWeaponDetail(g, wid){
+  const w = g.weapons.find(x=>x.id===wid);
+  const changes = [];
+  g.weaponPatches.forEach(p=>{
+    p.lines.forEach(l=>{
+      if(l.wid===wid) changes.push({...l, ver:p.ver, date:p.date});
+    });
+  });
+  const buffs = changes.filter(c=>c.t==="buff").length;
+  const nerfs = changes.filter(c=>c.t==="nerf").length;
+
+  const rows = changes.map(c=>{
+    const sym = SYM[c.t];
+    return `
+      <div class="char-entry">
+        <div class="cev"><span class="cver">${c.ver}</span>${c.date}</div>
+        ${meterHtml(c)}
+        <div class="ctext"><span class="diff-sym" style="display:inline;width:auto;margin-right:4px;" >${sym}</span>${c.text}</div>
+      </div>`;
+  }).join('');
+
+  const hopupHtml = w.hopup
+    ? `<div class="ability-block"><div class="ability-block-label">対応ホップアップ</div>
+        <div class="ability-row"><span class="ability-tag tactical mod">MOD</span><div><div class="ability-name">${w.hopup}</div><div class="ability-desc">${HOPUP_DESC[w.hopup] || ''}</div></div></div>
+      </div>`
+    : `<div class="char-summary">この武器に専用ホップアップはありません。</div>`;
+
+  return `
+    <button class="back-link" id="backWeaponBtn">← すべての変更履歴に戻る</button>
+    <div class="char-head">
+      ${weaponAvatarHtml(w.category, 44)}
+      <div>
+        <h2>${w.name}</h2>
+        <div class="role">${w.category}</div>
+      </div>
+    </div>
+    ${hopupHtml}
+    <div class="char-summary">この1年の変更: <b class="b">${buffs}件のバフ</b> / <b class="n">${nerfs}件のナーフ</b>（バーの伸びが大きいほど変化幅が大きいことを示します）</div>
+    ${rows || '<div class="char-summary">この武器の変更履歴はまだありません。</div>'}
+  `;
+}
+
+function weaponCatTabsHtml(g){
+  if(!g.weapons || g.weapons.length===0) return '';
+  const catSel = selectedWeaponCat[current];
+  const allActive = !catSel ? ' active' : '';
+  const allTab = `
+    <div class="class-tab all${allActive}" data-cat="" style="--tab-color:${g.color}">
+      <div class="ct-icon" style="background:${g.color}22">${ICONS[g.icon](g.color)}</div>
+      <div class="ct-label">すべて</div>
+      <div class="ct-count">${g.weapons.length}</div>
+    </div>`;
+  const tabs = WEAPON_CAT_ORDER.map(cat=>{
+    const count = g.weapons.filter(w=>w.category===cat).length;
+    const color = WEAPON_CAT_COLORS[cat];
+    const active = catSel===cat ? ' active' : '';
+    const gen = WEAPON_CAT_ICONS[cat];
+    return `
+      <div class="class-tab${active}" data-cat="${cat}" style="--tab-color:${color}">
+        <div class="ct-icon" style="background:${color}22">${gen(color,16)}</div>
+        <div class="ct-label">${cat}</div>
+        <div class="ct-count">${count}</div>
+      </div>`;
+  }).join('');
+  return `<div class="class-row">${allTab}${tabs}</div>`;
+}
+
+function perksHtml(r){
+  if(!r.perks) return '';
+  const tiers = r.perks.map(tier=>{
+    const opts = tier.options.map(o=>`
+      <div class="perk-opt">
+        <div class="perk-name">${o.name}</div>
+        <div class="perk-desc">${o.desc}</div>
+      </div>`).join('');
+    return `
+      <div class="perk-tier">
+        <div class="perk-tier-label">${tier.tier}</div>
+        <div class="perk-opts">${opts}</div>
+      </div>`;
+  }).join('');
+  return `
+    <div class="ability-block">
+      <div class="ability-block-label">現在のパーク（レジェンドアップグレード）</div>
+      ${tiers}
+    </div>`;
+}
+
+function abilitiesHtml(r){
+  if(!r.passives) return '';
+  const passiveRows = r.passives.map(p=>`
+    <div class="ability-row">
+      <span class="ability-tag passive">パッシブ</span>
+      <div><div class="ability-name">${p.name}</div><div class="ability-desc">${p.desc}</div></div>
+    </div>`).join('');
+  const tacticalRow = `
+    <div class="ability-row">
+      <span class="ability-tag tactical">戦術</span>
+      <div><div class="ability-name">${r.tactical.name}</div><div class="ability-desc">${r.tactical.desc}</div></div>
+    </div>`;
+  const ultimateRow = `
+    <div class="ability-row">
+      <span class="ability-tag ultimate">アルティメット</span>
+      <div><div class="ability-name">${r.ultimate.name}</div><div class="ability-desc">${r.ultimate.desc}</div></div>
+    </div>`;
+  return `
+    <div class="ability-block">
+      <div class="ability-block-label">現在のアビリティ</div>
+      ${passiveRows}${tacticalRow}${ultimateRow}
+    </div>`;
+}
+
+function renderCharView(g, rid){
+  const r = g.roster.find(x=>x.id===rid);
+  const changes = [];
+  g.patches.forEach(p=>{
+    p.lines.forEach(l=>{
+      if(l.rid===rid) changes.push({...l, ver:p.ver, date:p.date});
+    });
+  });
+  const buffs = changes.filter(c=>c.t==="buff").length;
+  const nerfs = changes.filter(c=>c.t==="nerf").length;
+
+  const rows = changes.map(c=>{
+    const sym = SYM[c.t];
+    return `
+      <div class="char-entry">
+        <div class="cev"><span class="cver">${c.ver}</span>${c.date}</div>
+        ${meterHtml(c)}
+        <div class="ctext"><span class="diff-sym" style="display:inline;width:auto;margin-right:4px;" >${sym}</span>${c.text}</div>
+      </div>`;
+  }).join('');
+
+  return `
+    <button class="back-link" id="backBtn">← すべての変更履歴に戻る</button>
+    <div class="char-head">
+      ${classAvatarHtml(r.role, 44)}
+      <div>
+        <h2>${r.name}</h2>
+        <div class="role">${r.role}</div>
+      </div>
+    </div>
+    ${abilitiesHtml(r)}
+    ${perksHtml(r)}
+    <div class="char-summary">この1年の変更: <b class="b">${buffs}件のバフ</b> / <b class="n">${nerfs}件のナーフ</b>（バーの伸びが大きいほど変化幅が大きいことを示します）</div>
+    ${rows || '<div class="char-summary">このキャラクターの変更履歴はまだありません。</div>'}
+  `;
+}
+
+function classTabsHtml(g){
+  if(g.roster.length===0) return '';
+  const rolesPresent = [...new Set(g.roster.map(r=>r.role))];
+  if(rolesPresent.length<2) return '';
+  const ordered = CLASS_ORDER.filter(c=>rolesPresent.includes(c)).concat(rolesPresent.filter(c=>!CLASS_ORDER.includes(c)));
+  const sel = selectedClass[current];
+  const allActive = !sel ? ' active' : '';
+  const allTab = `
+    <div class="class-tab all${allActive}" data-role="" style="--tab-color:${g.color}">
+      <div class="ct-icon" style="background:${g.color}22">${ICONS[g.icon](g.color)}</div>
+      <div class="ct-label">すべて</div>
+      <div class="ct-count">${g.roster.length}</div>
+    </div>`;
+  const tabs = ordered.map(role=>{
+    const count = g.roster.filter(r=>r.role===role).length;
+    const color = CLASS_COLORS[role] || g.color;
+    const active = sel===role ? ' active' : '';
+    const gen = CLASS_ICONS[role] || CLASS_ICONS["アサルト"];
+    return `
+      <div class="class-tab${active}" data-role="${role}" style="--tab-color:${color}">
+        <div class="ct-icon" style="background:${color}22">${gen(color,16)}</div>
+        <div class="ct-label">${role}</div>
+        <div class="ct-count">${count}</div>
+      </div>`;
+  }).join('');
+  return `<div class="class-row">${allTab}${tabs}</div>`;
+}
+
+function renderMain(){
+  const g = DATA[current];
+  const main = document.getElementById('main');
+  const tab = (g.weapons && g.weapons.length>0) ? (activeTab[current] || 'legends') : 'legends';
+  const sel = selectedChar[current];
+  const wsel = selectedWeapon[current];
+  const hasPatches = g.patches.length > 0;
+
+  const badge = hasPatches
+    ? `<span class="latest-badge">最新 ${g.patches[0].ver}</span>`
+    : `<span class="latest-badge empty">データ未登録</span>`;
+
+  let body;
+  if(tab==='weapons'){
+    body = `${renderWeaponRoster(g)}<div id="detailArea">${ wsel ? renderWeaponDetail(g, wsel) : renderTimeline(g.weaponPatches) }</div>`;
+  } else if(!hasPatches){
+    body = `<div class="empty-state">まだパッチノートが登録されていません。<br>キャラクター一覧やバージョン履歴を追加すると、他のタイトルと同じ形式で表示されます。</div>`;
+  } else {
+    body = `${renderRoster(g)}<div id="detailArea">${ sel ? renderCharView(g, sel) : renderTimeline(g.patches) }</div>`;
+  }
+
+  main.innerHTML = `
+    <div class="game-head">
+      ${iconHtml(g.icon, g.color, 'g-icon-lg')}
+      <h1>${g.name}</h1>
+      ${badge}
+    </div>
+    <div class="game-sub">${g.tagline || '追加されたタイトル'}</div>
+    ${sectionTabsHtml(g)}
+    ${body}
+  `;
+
+  if(tab==='weapons'){
+    main.querySelectorAll('.class-tab').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const cat = el.getAttribute('data-cat');
+        selectedWeaponCat[current] = cat || null;
+        selectedWeapon[current] = null;
+        renderMain();
+      });
+    });
+  } else {
+    main.querySelectorAll('.class-tab').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const role = el.getAttribute('data-role');
+        selectedClass[current] = role || null;
+        selectedChar[current] = null;
+        renderMain();
+      });
+    });
+  }
+
+  main.querySelectorAll('.sec-tab').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      activeTab[current] = el.getAttribute('data-sec');
+      renderMain();
+    });
+  });
+
+  main.querySelectorAll('.roster-chip').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      if(tab==='weapons'){
+        const wid = el.getAttribute('data-wid');
+        selectedWeapon[current] = wid || null;
+      } else {
+        const rid = el.getAttribute('data-rid');
+        selectedChar[current] = rid || null;
+      }
+      renderMain();
+    });
+  });
+  const back = document.getElementById('backBtn');
+  if(back){ back.addEventListener('click', ()=>{ selectedChar[current]=null; renderMain(); }); }
+  const backW = document.getElementById('backWeaponBtn');
+  if(backW){ backW.addEventListener('click', ()=>{ selectedWeapon[current]=null; renderMain(); }); }
+}
+
+function render(){
+  renderSidebar();
+  renderMain();
+  const panel = document.querySelector('.brand-panel');
+  if(panel) panel.style.background = DATA[current].color;
+  document.documentElement.style.setProperty('--game-color', DATA[current].color);
+}
+
+/* ---- add game ---- */
+const toggleBtn = document.getElementById('addGameToggle');
+const form = document.getElementById('addGameForm');
+const nameInput = document.getElementById('newGameName');
+
+toggleBtn.addEventListener('click', ()=>{
+  form.classList.toggle('open');
+  if(form.classList.contains('open')) nameInput.focus();
+});
+document.getElementById('addGameCancel').addEventListener('click', ()=>{
+  form.classList.remove('open');
+  nameInput.value='';
+});
+document.getElementById('addGameSubmit').addEventListener('click', submitNewGame);
+nameInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter') submitNewGame(); });
+
+function submitNewGame(){
+  const name = nameInput.value.trim();
+  if(!name) return;
+  const id = 'custom_' + Date.now();
+  const color = NEW_GAME_COLORS[newGameCount % NEW_GAME_COLORS.length];
+  const icon = ICON_KEYS[newGameCount % ICON_KEYS.length];
+  newGameCount++;
+  DATA[id] = {
+    name: name, color: color, tagline: '', updated: '-', icon: icon,
+    rosterLabel: 'キャラクター', roster: [], patches: []
+  };
+  current = id;
+  nameInput.value = '';
+  form.classList.remove('open');
+  render();
+}
+
+/* ---- apex-data.json の自動取得(あれば取り込む。無ければ何も起きない) ---- */
+function findRidByName(name){
+  if(!name) return null;
+  const g = DATA.apex;
+  const r = g.roster.find(x => name.includes(x.name) || x.name.includes(name));
+  if(r) return r.id;
+  const w = g.weapons.find(x => name.includes(x.name) || x.name.includes(name));
+  if(w) return w.id;
+  return null; // 一致するキャラ/武器が見つからなければ null のまま(全体タイムラインには表示される)
+}
+
+async function loadRemotePatches(){
+  try{
+    const res = await fetch('apex-data.json', {cache:'no-store'});
+    if(!res.ok) return; // ファイルがまだ無い場合などは静かに諦める
+    const remote = await res.json();
+    if(!remote.patches || !remote.patches.length) return;
+
+    const converted = remote.patches.map(p => ({
+      ver: p.ver || '自動検知パッチ',
+      date: p.date || '',
+      title: '公式パッチノートより自動反映' + (p.source ? `（${p.source}）` : ''),
+      lines: (p.lines || []).map(l => ({
+        t: l.type,
+        rid: findRidByName(l.target),
+        target: l.target,
+        text: l.text,
+        mag: l.magnitude,
+      })),
+    }));
+
+    // 自動取得分を一覧の先頭に追加する
+    DATA.apex.patches = [...converted, ...DATA.apex.patches];
+  }catch(e){
+    // オフライン・ローカルファイルとして開いている等で失敗しても、
+    // 内蔵データでの表示を止めないようにする
+    console.warn('apex-data.json の読み込みをスキップしました:', e);
+  }
+}
+
+render();               // まずは内蔵データですぐ表示
+loadRemotePatches().then(() => {
+  if(current === 'apex') render();  // 追加データが取れたら、表示中なら更新する
+});
+</script>
+
+</body>
+</html>
