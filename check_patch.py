@@ -10,7 +10,6 @@ check_patch.py
 import os
 import re
 import json
-import time
 import requests
 from google import genai
 
@@ -79,29 +78,13 @@ magnitude は buff/nerf のときだけ 1〜3 の整数で、変化の大きさ�
 本文:
 {patch_text}
 """
-    response = generate_with_retry(client, prompt)
+    response = client.models.generate_content(
+        model=MODEL_NAME,
+        contents=prompt,
+    )
     raw = response.text.strip()
     raw = re.sub(r"^```json|```$", "", raw, flags=re.M).strip()
     return json.loads(raw)
-
-
-def generate_with_retry(client, prompt, max_tries=4):
-    """Geminiが一時的に混雑している(503)ときのために、
-    少し待って複数回リトライする。"""
-    for attempt in range(1, max_tries + 1):
-        try:
-            return client.models.generate_content(
-                model=MODEL_NAME,
-                contents=prompt,
-            )
-        except Exception as e:
-            is_last = attempt == max_tries
-            print(f"Gemini呼び出し失敗(試行{attempt}/{max_tries}): {e}")
-            if is_last:
-                raise
-            wait_seconds = 15 * attempt  # 15秒, 30秒, 45秒...と待ち時間を延ばす
-            print(f"{wait_seconds}秒待って再試行します")
-            time.sleep(wait_seconds)
 
 
 # ---------- ④ apex-data.json に追記 ----------
