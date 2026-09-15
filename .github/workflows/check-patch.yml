@@ -29,7 +29,7 @@ jobs:
 
       # 3. スクリプトが必要とするライブラリをインストール
       - name: 必要なライブラリをインストール
-        run: pip install requests google-generativeai
+        run: pip install requests google-genai
 
       # 4. 本体のスクリプトを実行(新パッチのチェック→変換→JSON更新までここでやる)
       - name: パッチチェックを実行
