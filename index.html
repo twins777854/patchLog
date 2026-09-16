@@ -284,6 +284,22 @@ main{grid-area:main; padding:32px 48px 60px; max-width:1300px; margin:0 auto; wi
   color:var(--text-faint); font-size:12.5px; line-height:1.7;
 }
 
+/* events */
+.event-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px; margin-bottom:28px; }
+.event-card{ background:var(--panel); border:1px solid var(--border); overflow:hidden; }
+.event-banner{ height:72px; position:relative; display:flex; align-items:center; justify-content:center; }
+.event-icon{ width:40px; height:40px; background:rgba(255,255,255,0.15) !important; border-radius:50%; }
+.event-live{
+  position:absolute; top:8px; right:8px; background:#0b0d12; color:#fff; font-family:var(--disp);
+  font-weight:700; font-size:10px; padding:2px 8px; letter-spacing:0.04em; text-transform:uppercase;
+  clip-path:polygon(5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%,0 5px);
+}
+.event-body{ padding:12px 14px 14px; }
+.event-kind{ font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px; }
+.event-name{ font-family:var(--disp); font-weight:700; font-size:15px; color:var(--text); margin-bottom:4px; line-height:1.25; }
+.event-period{ font-family:var(--mono); font-size:10.5px; color:var(--text-faint); margin-bottom:8px; }
+.event-desc{ font-size:12px; color:var(--text-dim); line-height:1.6; }
+
 footer{ grid-area:footer; border-top:1px solid var(--border); padding:20px 40px 32px; font-size:11px; color:var(--text-faint); }
 @media (max-width:600px){ footer{padding:18px;} }
 
@@ -591,11 +607,11 @@ const DATA = {
       ]},
     ],
     weapons:[
-      {id:"r301",name:"R-301カービン",category:"アサルトライフル",hopup:{name:"アンヴィルレシーバー",desc:"ADS（照準）中に命中させると追加ダメージが発生する"}},
-      {id:"flatline",name:"フラットライン",category:"アサルトライフル",hopup:{name:"アンヴィルレシーバー",desc:"ADS（照準）中に命中させると追加ダメージが発生する"}},
+      {id:"r301",name:"R-301カービン",category:"アサルトライフル"},
+      {id:"flatline",name:"フラットライン",category:"アサルトライフル"},
       {id:"hemlok",name:"ヘムロック",category:"アサルトライフル"},
       {id:"nemesis",name:"ネメシス",category:"アサルトライフル"},
-      {id:"havoc",name:"ハボック",category:"アサルトライフル",hopup:{name:"ターボチャージャー",desc:"スピンアップ時間を短縮し、素早くフル火力に到達できるようにする"}},
+      {id:"havoc",name:"ハボック",category:"アサルトライフル",hopup:"ターボチャージャー"},
       {id:"r99",name:"R-99",category:"サブマシンガン"},
       {id:"volt",name:"ヴォルト",category:"サブマシンガン"},
       {id:"car",name:"C.A.R.",category:"サブマシンガン"},
@@ -628,6 +644,7 @@ const DATA = {
         {t:"nerf",wid:"g7scout",target:"G7スカウト",text:"ケアパッケージ落選に伴い通常武器仕様へ弱体化",mag:1},
         {t:"buff",wid:"repeater",target:"30-30リピーター",text:"ケアパッケージ入りに伴い大幅強化",mag:3},
         {t:"buff",wid:"mozambique",target:"モザンビーク",text:"新ホップアップ「シャッターキャップ」を追加。腰だめ時に弾が拡散し1射撃7ペレットのショットガン運用が可能に",mag:2},
+        {t:"nerf",wid:null,target:"ゴールドアタッチメント",text:"ホットゾーン・ゴールドアタッチメント・ミシックボックスをシステムごと削除。R-301／フラットライン専用だった「アンヴィルレシーバー」も同時に姿を消した",mag:2},
       ]},
       {ver:"S29 中間",date:"2026-06-23",title:"専用ホップアップの再配分、ネメシスに新ホップアップ追加",lines:[
         {t:"nerf",wid:"longbow",target:"ロングボウ",text:"専用ホップアップ「デッドアイズテンポ」を取り外し",mag:1},
@@ -640,6 +657,24 @@ const DATA = {
       {ver:"S29 Overclocked",date:"2026-05-05",title:"新シーズン開幕、ライトアモ武器全体を抑制",lines:[
         {t:"change",wid:null,target:"ライトアモ武器全般",text:"所持数の上限を72発から60発に減少し、クラス全体の持続力を抑制"},
       ]},
+    ],
+    events:[
+      {id:"sf6",name:"ストリートファイター6 コラボ",kind:"コラボ",start:"2026-09-16",end:"",status:"current",color:"#e8322a",icon:"bolt",
+        desc:"『ストリートファイター6』とのガチコラボ。リュウ姿のスパロー、ルーク姿のミラージュ、春麗姿のオルターなど8体のコラボスキンに加え、波動拳をモチーフにした新ミシック武器が登場。"},
+      {id:"redbull",name:"レッドブル × Apex ファミマキャンペーン",kind:"リアル連動",start:"2026-09-15",end:"2026-09-28",status:"current",color:"#1f7a3f",icon:"peak",
+        desc:"ファミリーマート限定のコラボキャンペーン。対象商品2本購入でホロスプレー付きカードがもらえるほか、抽選でALGS Year 6 Championship招待や限定コントローラーが当たる。"},
+      {id:"ascended-hunt",name:"アセンデッドハント",kind:"期間限定イベント",start:"2026-08-18",end:"",status:"past",color:"#e8b93e",icon:"orbit",
+        desc:"ジブラルタルのプレステージスキン「Apexブラザー」が段階的に進化する期間限定イベント。ワイルドカードに進化ポイント強化カードが6種追加された。"},
+      {id:"nessie-cafe",name:"ネッシーカフェ 2026",kind:"リアルコラボ",start:"2026-08-06",end:"",status:"past",color:"#5fa8d3",icon:"diamond",
+        desc:"5周年を記念したリアル店舗コラボカフェ。全国4都市6店舗に拡大し、札幌・仙台にも初上陸。"},
+      {id:"cyberpunk",name:"サイバーパンク2077 エッジランナーズ コラボ",kind:"コラボ",start:"2026-07-14",end:"",status:"past",color:"#5fa8d3",icon:"hex",
+        desc:"『サイバーパンク2077: エッジランナーズ』とのコラボ。8体のコラボスキンと新ミシック武器が実装された。"},
+      {id:"power-trip",name:"パワートリップ",kind:"期間限定イベント",start:"2026-06-03",end:"",status:"past",color:"#a259e6",icon:"spark",
+        desc:"マップが縮む・武器が爆発する・ミシック級装備だらけになるなど、通常とは違うルールで戦うカオスな期間限定モード。"},
+      {id:"gundam",name:"ガンダム コラボ",kind:"コラボ",start:"2026-03-11",end:"",status:"past",color:"#e2704f",icon:"peak",
+        desc:"『機動戦士ガンダム』とのコラボ。ブロークンムーンがモビルスーツの戦場と化す、シリーズ史上最大級のコラボ企画。"},
+      {id:"aftershock",name:"アフターショック（S28中間アップデート）",kind:"中間アップデート",start:"2026-03-31",end:"",status:"past",color:"#e0ab58",icon:"orbit",
+        desc:"シーズン28の中間アップデート。弾を跳ね返す新ワイルドカード「ボルテックスシールド」の追加や、ジブラルタルの大幅強化が行われた。"},
     ]
   }
 };
@@ -778,7 +813,7 @@ function renderTimeline(patches){
     return `
       <div class="entry">
         <div class="entry-head"><span class="ver">${p.ver}</span><span class="date">${p.date}</span></div>
-        <div class="entry-title">${p.title}</div>
+        ${p.title ? `<div class="entry-title">${p.title}</div>` : ''}
         ${lines}
       </div>`;
   }).join('');
@@ -787,12 +822,15 @@ function renderTimeline(patches){
 }
 
 function sectionTabsHtml(g){
-  if(!g.weapons || g.weapons.length===0) return '';
+  const hasWeapons = g.weapons && g.weapons.length>0;
+  const hasEvents = g.events && g.events.length>0;
+  if(!hasWeapons && !hasEvents) return '';
   const tab = activeTab[current] || 'legends';
   return `
     <div class="section-toggle">
       <button class="sec-tab${tab==='legends'?' active':''}" data-sec="legends">レジェンド</button>
-      <button class="sec-tab${tab==='weapons'?' active':''}" data-sec="weapons">武器</button>
+      ${hasWeapons ? `<button class="sec-tab${tab==='weapons'?' active':''}" data-sec="weapons">武器</button>` : ''}
+      ${hasEvents ? `<button class="sec-tab${tab==='events'?' active':''}" data-sec="events">イベント</button>` : ''}
     </div>`;
 }
 
@@ -1018,10 +1056,55 @@ function classTabsHtml(g){
   return `<div class="class-row">${allTab}${tabs}</div>`;
 }
 
+function isEventCurrent(e){
+  if(!e.start) return false;
+  const today = new Date();
+  const start = new Date(e.start);
+  const end = e.end ? new Date(e.end) : new Date(start.getTime() + 14*24*60*60*1000); // 終了日不明なら開始から2週間を目安にする
+  return today >= start && today <= end;
+}
+
+function renderEvents(g){
+  const events = g.events || [];
+  const current_ = events.filter(isEventCurrent);
+  const past = events.filter(e => !isEventCurrent(e));
+
+  function cardHtml(e){
+    const live = isEventCurrent(e);
+    const color = e.color || '#8b93a3';
+    const icon = e.icon || 'orbit';
+    const period = e.end ? `${e.start} 〜 ${e.end}` : `${e.start} 〜`;
+    return `
+      <div class="event-card">
+        <div class="event-banner" style="background:linear-gradient(135deg, ${color}, ${color}55)">
+          ${iconHtml(icon, '#ffffff', 'event-icon')}
+          ${live ? '<span class="event-live">開催中</span>' : ''}
+        </div>
+        <div class="event-body">
+          <div class="event-kind" style="color:${color}">${e.kind || ''}</div>
+          <div class="event-name">${e.name}</div>
+          <div class="event-period">${period}</div>
+          <div class="event-desc">${e.desc || ''}</div>
+        </div>
+      </div>`;
+  }
+
+  return `
+    ${current_.length ? `
+      <div class="roster-label">開催中のイベント</div>
+      <div class="event-grid">${current_.map(cardHtml).join('')}</div>
+    ` : ''}
+    <div class="roster-label" style="margin-top:${current_.length?'8px':'0'}">過去のイベント</div>
+    <div class="event-grid">${past.map(cardHtml).join('')}</div>
+  `;
+}
+
 function renderMain(){
   const g = DATA[current];
   const main = document.getElementById('main');
-  const tab = (g.weapons && g.weapons.length>0) ? (activeTab[current] || 'legends') : 'legends';
+  const hasWeapons = g.weapons && g.weapons.length>0;
+  const hasEvents = g.events && g.events.length>0;
+  const tab = (hasWeapons||hasEvents) ? (activeTab[current] || 'legends') : 'legends';
   const sel = selectedChar[current];
   const wsel = selectedWeapon[current];
   const hasPatches = g.patches.length > 0;
@@ -1031,7 +1114,9 @@ function renderMain(){
     : `<span class="latest-badge empty">データ未登録</span>`;
 
   let body;
-  if(tab==='weapons'){
+  if(tab==='events'){
+    body = renderEvents(g);
+  } else if(tab==='weapons'){
     body = `${renderWeaponRoster(g)}<div id="detailArea">${ wsel ? renderWeaponDetail(g, wsel) : renderTimeline(g.weaponPatches) }</div>`;
   } else if(!hasPatches){
     body = `<div class="empty-state">まだパッチノートが登録されていません。<br>キャラクター一覧やバージョン履歴を追加すると、他のタイトルと同じ形式で表示されます。</div>`;
@@ -1147,28 +1232,59 @@ function findRidByName(name){
   return null; // 一致するキャラ/武器が見つからなければ null のまま(全体タイムラインには表示される)
 }
 
+const EVENT_KIND_STYLE = {
+  "コラボ": {color:"#e2704f", icon:"hex"},
+  "期間限定イベント": {color:"#e0ab58", icon:"orbit"},
+  "中間アップデート": {color:"#5fa8d3", icon:"peak"},
+  "リアルコラボ": {color:"#5fa8d3", icon:"diamond"},
+  "リアル連動": {color:"#6fbf8b", icon:"peak"},
+};
+function styleForEventKind(kind){
+  return EVENT_KIND_STYLE[kind] || {color:"#8b93a3", icon:"spark"};
+}
+
 async function loadRemotePatches(){
   try{
     const res = await fetch('apex-data.json', {cache:'no-store'});
     if(!res.ok) return; // ファイルがまだ無い場合などは静かに諦める
     const remote = await res.json();
-    if(!remote.patches || !remote.patches.length) return;
 
-    const converted = remote.patches.map(p => ({
-      ver: p.ver || '自動検知パッチ',
-      date: p.date || '',
-      title: '公式パッチノートより自動反映' + (p.source ? `（${p.source}）` : ''),
-      lines: (p.lines || []).map(l => ({
-        t: l.type,
-        rid: findRidByName(l.target),
-        target: l.target,
-        text: l.text,
-        mag: l.magnitude,
-      })),
-    }));
+    if(remote.patches && remote.patches.length){
+      const converted = remote.patches.map(p => ({
+        ver: p.ver || '最新アップデート',
+        date: p.date || '',
+        title: '',
+        lines: (p.lines || []).map(l => ({
+          t: l.type,
+          rid: findRidByName(l.target),
+          target: l.target,
+          text: l.text,
+          mag: l.magnitude,
+        })),
+      }));
+      // 自動取得分を一覧の先頭に追加する
+      DATA.apex.patches = [...converted, ...DATA.apex.patches];
+    }
 
-    // 自動取得分を一覧の先頭に追加する
-    DATA.apex.patches = [...converted, ...DATA.apex.patches];
+    if(remote.events && remote.events.length){
+      const existingNames = new Set(DATA.apex.events.map(e => e.name));
+      const newEvents = remote.events
+        .filter(e => e.name && !existingNames.has(e.name)) // 同じ名前のイベントは重複させない
+        .map(e => {
+          const style = styleForEventKind(e.kind);
+          return {
+            id: 'auto_' + (e.name || Math.random()),
+            name: e.name,
+            kind: e.kind || 'イベント',
+            start: e.start || '',
+            end: e.end || '',
+            desc: e.desc || '',
+            color: style.color,
+            icon: style.icon,
+          };
+        });
+      DATA.apex.events = [...newEvents, ...DATA.apex.events];
+    }
   }catch(e){
     // オフライン・ローカルファイルとして開いている等で失敗しても、
     // 内蔵データでの表示を止めないようにする
