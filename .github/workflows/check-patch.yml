@@ -1,38 +1,54 @@
+# このファイルの置き場所: .github/workflows/check-patch.yml
+# GitHubがこのファイルを見つけると、自動でスケジュール実行してくれます。
+
 name: パッチチェック
 
 on:
   schedule:
+    # UTC(協定世界時)で指定します。日本時間はUTC+9なので、
+    # "0 9 * * *" = 毎日 UTC 9:00 = 日本時間 18:00 に実行、という意味です。
     - cron: "0 9 * * *"
+  # 手動で「今すぐ試しに実行」もできるようにしておくボタン(任意・おすすめ)
   workflow_dispatch:
 
+# このワークフローがリポジトリに書き込み(コミット&プッシュ)できるようにする
 permissions:
   contents: write
 
 jobs:
   check:
+    # GitHubが無料で貸してくれる仮想のPC(Ubuntu)を1台使う、という意味
     runs-on: ubuntu-latest
 
     steps:
+      # 1. リポジトリの中身(HTML/JSONファイルなど)をこの仮想PCにコピーしてくる
       - name: リポジトリを取得
         uses: actions/checkout@v4
 
+      # 2. Pythonを使えるようにする
       - name: Pythonをセットアップ
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
+      # 3. スクリプトが必要とするライブラリをインストール
       - name: 必要なライブラリをインストール
         run: pip install requests google-genai
 
+      # 4. 本体のスクリプトを実行(新パッチのチェック→変換→JSON更新までここでやる)
       - name: パッチチェックを実行
         env:
+          # ④で保存したSecretを、このステップの中だけ環境変数として使えるようにする
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python check_patch.py
 
+      # 5. もしJSONファイルが更新されていたら、その変更をリポジトリに自動で保存(コミット&プッシュ)する
       - name: 変更があればコミットしてプッシュ
         run: |
           git config user.name "patch-bot"
           git config user.email "patch-bot@users.noreply.github.com"
           git add apex-data.json
           git diff --cached --quiet || git commit -m "自動更新: 新しいパッチ情報を反映"
+          # プッシュする直前に最新の状態を取り込んでおく(タイミングの衝突を防ぐ)
+          git pull --rebase origin main
           git push
