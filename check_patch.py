@@ -113,7 +113,7 @@ def convert_with_gemini(patch_text, source_name):
     return parsed.get("patches", []), parsed.get("events", [])
 
 
-def generate_with_retry(client, prompt, max_tries=3):
+def generate_with_retry(client, prompt, max_tries=2):
     """Geminiが一時的に混雑している(503)ときのために、
     少し待って複数回リトライする。それでもダメなら予備モデルに切り替える。"""
     for model_name in [MODEL_NAME, FALLBACK_MODEL]:
