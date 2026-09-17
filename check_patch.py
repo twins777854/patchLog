@@ -37,7 +37,7 @@ LAST_SEEN_FILE = "last_seen.json"      # ソースごとに前回確認した記
 DATA_FILE = "apex-data.json"           # サイトが表示に使っているデータファイル
 
 MODEL_NAME = "gemini-flash-latest"
-FALLBACK_MODEL = "gemini-2.0-flash"
+FALLBACK_MODEL = "gemini-3.6-flash"
 
 
 # ---------- ① 各ソースの一覧ページから最新記事リンクを拾う ----------
