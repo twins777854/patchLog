@@ -299,6 +299,10 @@ main{grid-area:main; padding:32px 48px 60px; max-width:1300px; margin:0 auto; wi
 .event-name{ font-family:var(--disp); font-weight:700; font-size:15px; color:var(--text); margin-bottom:4px; line-height:1.25; }
 .event-period{ font-family:var(--mono); font-size:10.5px; color:var(--text-faint); margin-bottom:8px; }
 .event-desc{ font-size:12px; color:var(--text-dim); line-height:1.6; }
+.event-card{ text-decoration:none; display:block; transition:border-color .15s ease, transform .15s ease; cursor:default; }
+a.event-card{ cursor:pointer; }
+a.event-card:hover{ border-color:var(--text-faint); transform:translateY(-2px); }
+.event-link{ margin-top:10px; font-size:11px; font-weight:700; color:var(--new); }
 
 footer{ grid-area:footer; border-top:1px solid var(--border); padding:20px 40px 32px; font-size:11px; color:var(--text-faint); }
 @media (max-width:600px){ footer{padding:18px;} }
@@ -660,20 +664,28 @@ const DATA = {
     ],
     events:[
       {id:"sf6",name:"ストリートファイター6 コラボ",kind:"コラボ",start:"2026-09-16",end:"",status:"current",color:"#e8322a",icon:"bolt",
+        url:"https://www.ea.com/ja/games/apex-legends/apex-legends/news/street-fighter-6-event",
         desc:"『ストリートファイター6』とのガチコラボ。リュウ姿のスパロー、ルーク姿のミラージュ、春麗姿のオルターなど8体のコラボスキンに加え、波動拳をモチーフにした新ミシック武器が登場。"},
       {id:"redbull",name:"レッドブル × Apex ファミマキャンペーン",kind:"リアル連動",start:"2026-09-15",end:"2026-09-28",status:"current",color:"#1f7a3f",icon:"peak",
+        url:"https://fpsjp.net/archives/category/apex-legends",
         desc:"ファミリーマート限定のコラボキャンペーン。対象商品2本購入でホロスプレー付きカードがもらえるほか、抽選でALGS Year 6 Championship招待や限定コントローラーが当たる。"},
       {id:"ascended-hunt",name:"アセンデッドハント",kind:"期間限定イベント",start:"2026-08-18",end:"",status:"past",color:"#e8b93e",icon:"orbit",
+        url:"https://www.ea.com/ja/games/apex-legends/apex-legends/news",
         desc:"ジブラルタルのプレステージスキン「Apexブラザー」が段階的に進化する期間限定イベント。ワイルドカードに進化ポイント強化カードが6種追加された。"},
       {id:"nessie-cafe",name:"ネッシーカフェ 2026",kind:"リアルコラボ",start:"2026-08-06",end:"",status:"past",color:"#5fa8d3",icon:"diamond",
+        url:"https://fpsjp.net/archives/category/apex-legends",
         desc:"5周年を記念したリアル店舗コラボカフェ。全国4都市6店舗に拡大し、札幌・仙台にも初上陸。"},
       {id:"cyberpunk",name:"サイバーパンク2077 エッジランナーズ コラボ",kind:"コラボ",start:"2026-07-14",end:"",status:"past",color:"#5fa8d3",icon:"hex",
+        url:"https://fpsjp.net/archives/category/apex-legends",
         desc:"『サイバーパンク2077: エッジランナーズ』とのコラボ。8体のコラボスキンと新ミシック武器が実装された。"},
       {id:"power-trip",name:"パワートリップ",kind:"期間限定イベント",start:"2026-06-03",end:"",status:"past",color:"#a259e6",icon:"spark",
+        url:"https://fpsjp.net/archives/category/apex-legends",
         desc:"マップが縮む・武器が爆発する・ミシック級装備だらけになるなど、通常とは違うルールで戦うカオスな期間限定モード。"},
       {id:"gundam",name:"ガンダム コラボ",kind:"コラボ",start:"2026-03-11",end:"",status:"past",color:"#e2704f",icon:"peak",
+        url:"https://fpsjp.net/archives/category/apex-legends",
         desc:"『機動戦士ガンダム』とのコラボ。ブロークンムーンがモビルスーツの戦場と化す、シリーズ史上最大級のコラボ企画。"},
       {id:"aftershock",name:"アフターショック（S28中間アップデート）",kind:"中間アップデート",start:"2026-03-31",end:"",status:"past",color:"#e0ab58",icon:"orbit",
+        url:"https://fpsjp.net/archives/category/apex-legends",
         desc:"シーズン28の中間アップデート。弾を跳ね返す新ワイルドカード「ボルテックスシールド」の追加や、ジブラルタルの大幅強化が行われた。"},
     ]
   }
@@ -1074,8 +1086,11 @@ function renderEvents(g){
     const color = e.color || '#8b93a3';
     const icon = e.icon || 'orbit';
     const period = e.end ? `${e.start} 〜 ${e.end}` : `${e.start} 〜`;
+    const url = e.url || e.source || '';
+    const tag = url ? 'a' : 'div';
+    const linkAttrs = url ? `href="${url}" target="_blank" rel="noopener"` : '';
     return `
-      <div class="event-card">
+      <${tag} class="event-card" ${linkAttrs}>
         <div class="event-banner" style="background:linear-gradient(135deg, ${color}, ${color}55)">
           ${iconHtml(icon, '#ffffff', 'event-icon')}
           ${live ? '<span class="event-live">開催中</span>' : ''}
@@ -1085,8 +1100,9 @@ function renderEvents(g){
           <div class="event-name">${e.name}</div>
           <div class="event-period">${period}</div>
           <div class="event-desc">${e.desc || ''}</div>
+          ${url ? '<div class="event-link">詳細を見る ↗</div>' : ''}
         </div>
-      </div>`;
+      </${tag}>`;
   }
 
   return `
@@ -1279,6 +1295,7 @@ async function loadRemotePatches(){
             start: e.start || '',
             end: e.end || '',
             desc: e.desc || '',
+            url: e.source || '',
             color: style.color,
             icon: style.icon,
           };
