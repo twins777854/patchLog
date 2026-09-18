@@ -15,6 +15,13 @@ on:
 permissions:
   contents: write
 
+# 同時に2つ以上実行されないようにする(データの衝突を防ぐ)
+# すでに実行中のものがあれば、新しい実行は「待たされる」のではなく
+# キャンセルされずに順番に処理される
+concurrency:
+  group: patch-check
+  cancel-in-progress: false
+
 jobs:
   check:
     # GitHubが無料で貸してくれる仮想のPC(Ubuntu)を1台使う、という意味
@@ -49,6 +56,8 @@ jobs:
           git config user.email "patch-bot@users.noreply.github.com"
           git add apex-data.json
           git diff --cached --quiet || git commit -m "自動更新: 新しいパッチ情報を反映"
-          # プッシュする直前に最新の状態を取り込んでおく(タイミングの衝突を防ぐ)
-          git pull --rebase origin main
-          git push
+          git fetch origin main
+          # 普通にプッシュしてみて、もし他の変更とぶつかっていたら
+          # (apex-data.jsonは人が手で編集するファイルではないので)
+          # 安全に自分の内容で上書きする
+          git push origin HEAD:main || git push --force-with-lease origin HEAD:main
