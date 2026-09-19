@@ -304,6 +304,38 @@ a.event-card{ cursor:pointer; }
 a.event-card:hover{ border-color:var(--text-faint); transform:translateY(-2px); }
 .event-link{ margin-top:10px; font-size:11px; font-weight:700; color:var(--new); }
 
+/* returning-player summary */
+.summary-select{
+  background:var(--panel-2); border:1px solid var(--border); color:var(--text);
+  font-family:var(--disp); font-weight:700; font-size:14px; padding:9px 14px;
+  border-radius:0; cursor:pointer; margin-bottom:14px;
+}
+.summary-lead{ font-size:13px; color:var(--text-dim); line-height:1.7; max-width:620px; }
+.summary-lead b{ color:var(--text); }
+
+.sum-headlines{ display:flex; flex-direction:column; gap:8px; margin-bottom:8px; }
+.sum-headline{ display:flex; align-items:baseline; gap:12px; padding:8px 0; border-bottom:1px solid var(--border); font-size:12.5px; }
+.sum-hl-ver{ font-family:var(--disp); font-weight:700; color:var(--text); flex:none; width:120px; }
+.sum-hl-date{ font-family:var(--mono); color:var(--text-faint); flex:none; width:90px; }
+.sum-hl-title{ color:var(--text-dim); }
+
+.sum-events{ display:flex; flex-direction:column; gap:6px; margin-bottom:8px; }
+.sum-event{ display:flex; align-items:center; gap:10px; font-size:12.5px; color:var(--text-dim); }
+.sum-event-dot{ width:8px; height:8px; border-radius:50%; flex:none; }
+.sum-event-name{ color:var(--text); font-weight:600; }
+.sum-event-date{ font-family:var(--mono); color:var(--text-faint); font-size:11px; }
+
+.sum-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px; margin-bottom:10px; }
+.sum-chip{ background:var(--panel); border:1px solid var(--border); padding:10px 12px; }
+.sum-name{ font-family:var(--disp); font-weight:700; font-size:13px; color:var(--text); margin-bottom:6px; }
+.sum-counts{ display:flex; gap:6px; margin-bottom:6px; }
+.sc{ font-family:var(--mono); font-size:11px; font-weight:700; padding:1px 6px; }
+.sc.buff{ color:var(--buff); background:var(--buff)1a; }
+.sc.nerf{ color:var(--nerf); background:var(--nerf)1a; }
+.sc.change{ color:var(--change); background:var(--change)1a; }
+.sc.new{ color:var(--new); background:var(--new)1a; }
+.sum-last{ font-size:11px; color:var(--text-faint); line-height:1.5; }
+
 footer{ grid-area:footer; border-top:1px solid var(--border); padding:20px 40px 32px; font-size:11px; color:var(--text-faint); }
 @media (max-width:600px){ footer{padding:18px;} }
 
@@ -836,10 +868,10 @@ function renderTimeline(patches){
 function sectionTabsHtml(g){
   const hasWeapons = g.weapons && g.weapons.length>0;
   const hasEvents = g.events && g.events.length>0;
-  if(!hasWeapons && !hasEvents) return '';
   const tab = activeTab[current] || 'legends';
   return `
     <div class="section-toggle">
+      <button class="sec-tab${tab==='summary'?' active':''}" data-sec="summary">復帰まとめ</button>
       <button class="sec-tab${tab==='legends'?' active':''}" data-sec="legends">レジェンド</button>
       ${hasWeapons ? `<button class="sec-tab${tab==='weapons'?' active':''}" data-sec="weapons">武器</button>` : ''}
       ${hasEvents ? `<button class="sec-tab${tab==='events'?' active':''}" data-sec="events">イベント</button>` : ''}
@@ -1115,12 +1147,111 @@ function renderEvents(g){
   `;
 }
 
+let selectedSummaryMonth = {};
+
+function monthLabel(ym){
+  const [y,m] = ym.split('-');
+  return `${y}年${parseInt(m,10)}月〜`;
+}
+
+function renderSummary(g){
+  const allPatches = [...(g.patches||[]), ...(g.weaponPatches||[])];
+  const dates = allPatches.map(p=>p.date).filter(Boolean).sort();
+  if(dates.length===0){
+    return `<div class="empty-state">まとめを作るためのパッチ履歴がまだありません。</div>`;
+  }
+
+  const months = [...new Set(dates.map(d=>d.slice(0,7)))].sort();
+  let sel = selectedSummaryMonth[current];
+  if(!sel || !months.includes(sel)) sel = months[0];
+  selectedSummaryMonth[current] = sel;
+
+  const cutoff = new Date(sel + '-01');
+  const now = new Date();
+  const monthsAway = Math.max(1, Math.round((now - cutoff) / (30*24*60*60*1000)));
+
+  const relevant = allPatches
+    .filter(p => p.date && new Date(p.date) >= cutoff)
+    .sort((a,b) => a.date.localeCompare(b.date));
+
+  const agg = {};
+  relevant.forEach(p=>{
+    (p.lines||[]).forEach(l=>{
+      if(!l.target) return;
+      if(!agg[l.target]) agg[l.target] = {buff:0,nerf:0,change:0,new:0,lastText:'',lastDate:''};
+      if(agg[l.target][l.t] !== undefined) agg[l.target][l.t]++;
+      if(!agg[l.target].lastDate || p.date >= agg[l.target].lastDate){
+        agg[l.target].lastText = l.text;
+        agg[l.target].lastDate = p.date;
+      }
+    });
+  });
+  const aggList = Object.entries(agg)
+    .map(([name,v]) => ({name, ...v, total: v.buff+v.nerf+v.change+v.new}))
+    .sort((a,b) => b.total - a.total)
+    .slice(0, 16);
+
+  const headlines = relevant.filter(p => p.title);
+  const relevantEvents = (g.events||[]).filter(e => e.start && new Date(e.start) >= cutoff);
+
+  const monthOptions = months.map(m =>
+    `<option value="${m}"${m===sel?' selected':''}>${monthLabel(m)}</option>`
+  ).join('');
+
+  const aggHtml = aggList.map(a => `
+    <div class="sum-chip">
+      <div class="sum-name">${a.name}</div>
+      <div class="sum-counts">
+        ${a.buff ? `<span class="sc buff">+${a.buff}</span>` : ''}
+        ${a.nerf ? `<span class="sc nerf">-${a.nerf}</span>` : ''}
+        ${a.change ? `<span class="sc change">~${a.change}</span>` : ''}
+        ${a.new ? `<span class="sc new">*${a.new}</span>` : ''}
+      </div>
+      <div class="sum-last">${a.lastText}</div>
+    </div>`).join('');
+
+  const headlineHtml = headlines.map(p => `
+    <div class="sum-headline">
+      <span class="sum-hl-ver">${p.ver}</span>
+      <span class="sum-hl-date">${p.date}</span>
+      <span class="sum-hl-title">${p.title}</span>
+    </div>`).join('');
+
+  const eventsHtml = relevantEvents.map(e => `
+    <div class="sum-event">
+      <span class="sum-event-dot" style="background:${e.color||'#8b93a3'}"></span>
+      <span class="sum-event-name">${e.name}</span>
+      <span class="sum-event-date">${e.start}</span>
+    </div>`).join('');
+
+  return `
+    <div class="summary-intro">
+      <div class="roster-label">いつ頃までプレイしていましたか？</div>
+      <select id="summaryMonthSelect" class="summary-select">${monthOptions}</select>
+      <p class="summary-lead">約${monthsAway}ヶ月ぶりの復帰、おつかれさまです。それ以降、<b>${relevant.length}件のアップデート</b>がありました。ざっくり何が変わったか、下にまとめています。</p>
+    </div>
+
+    ${headlineHtml ? `
+      <div class="roster-label" style="margin-top:24px">主なアップデート</div>
+      <div class="sum-headlines">${headlineHtml}</div>
+    ` : ''}
+
+    ${eventsHtml ? `
+      <div class="roster-label" style="margin-top:24px">あった主なイベント</div>
+      <div class="sum-events">${eventsHtml}</div>
+    ` : ''}
+
+    <div class="roster-label" style="margin-top:24px">キャラ・武器ごとの変化（変更が多い順）</div>
+    <div class="sum-grid">${aggHtml || '<div class="char-summary">この期間中の個別の変更はありませんでした。</div>'}</div>
+  `;
+}
+
 function renderMain(){
   const g = DATA[current];
   const main = document.getElementById('main');
   const hasWeapons = g.weapons && g.weapons.length>0;
   const hasEvents = g.events && g.events.length>0;
-  const tab = (hasWeapons||hasEvents) ? (activeTab[current] || 'legends') : 'legends';
+  const tab = activeTab[current] || 'legends';
   const sel = selectedChar[current];
   const wsel = selectedWeapon[current];
   const hasPatches = g.patches.length > 0;
@@ -1130,7 +1261,9 @@ function renderMain(){
     : `<span class="latest-badge empty">データ未登録</span>`;
 
   let body;
-  if(tab==='events'){
+  if(tab==='summary'){
+    body = renderSummary(g);
+  } else if(tab==='events'){
     body = renderEvents(g);
   } else if(tab==='weapons'){
     body = `${renderWeaponRoster(g)}<div id="detailArea">${ wsel ? renderWeaponDetail(g, wsel) : renderTimeline(g.weaponPatches) }</div>`;
@@ -1177,6 +1310,14 @@ function renderMain(){
       renderMain();
     });
   });
+
+  const monthSel = document.getElementById('summaryMonthSelect');
+  if(monthSel){
+    monthSel.addEventListener('change', ()=>{
+      selectedSummaryMonth[current] = monthSel.value;
+      renderMain();
+    });
+  }
 
   main.querySelectorAll('.roster-chip').forEach(el=>{
     el.addEventListener('click', ()=>{
