@@ -1408,7 +1408,7 @@ async function loadRemotePatches(){
 
     if(remote.patches && remote.patches.length){
       const converted = remote.patches.map(p => ({
-        ver: p.ver || '最新アップデート',
+        ver: (!p.ver || p.ver === '自動検知パッチ') ? '最新アップデート' : p.ver,
         date: p.date || '',
         title: '',
         lines: (p.lines || []).map(l => ({
