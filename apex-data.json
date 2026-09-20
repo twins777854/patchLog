@@ -131,6 +131,14 @@
   ],
   "events": [
     {
+      "name": "『Apex Legends』VS『ストリートファイター6』イベント",
+      "kind": "コラボ",
+      "start": "2026-09-22",
+      "end": "2026-10-13",
+      "desc": "『ストリートファイター6』とのコラボイベントが開催。リュウや春麗などの格闘スタイルを使える期間限定モードや、リミックスされたオリンパス、限定コラボスキンなどが登場する。",
+      "source": "https://www.ea.com/ja/games/apex-legends/apex-legends/news/street-fighter-6-event"
+    },
+    {
       "name": "『ストリートファイター6』コラボ",
       "kind": "コラボ",
       "start": "2026-09-23",
