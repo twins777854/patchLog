@@ -23,7 +23,7 @@
   --disp: 'Rajdhani', sans-serif;
 }
 
-*{box-sizing:border-box;}
+*{box-sizing:border-box; overflow-wrap:anywhere;}
 html,body{margin:0;padding:0;overflow-x:hidden;}
 body{
   background:var(--bg);
@@ -258,7 +258,7 @@ main{grid-area:main; padding:32px 48px 60px; max-width:1300px; margin:0 auto; wi
 .char-entry:last-child{ border-bottom:none; }
 .char-entry .cev{ font-size:11px; color:var(--text-faint); width:78px; flex:none; }
 .char-entry .cev .cver{ font-family:var(--disp); font-weight:700; color:var(--text); font-size:12.5px; display:block; }
-.char-entry .ctext{ font-size:13px; color:#d3d1cb; flex:1; line-height:1.6; min-width:0; overflow-wrap:break-word; }
+.char-entry .ctext{ font-size:13px; color:#d3d1cb; flex:1; line-height:1.6; min-width:0; overflow-wrap:anywhere; word-break:break-word; }
 
 /* timeline view (all changes) */
 .filters{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:26px; }
@@ -285,7 +285,7 @@ main{grid-area:main; padding:32px 48px 60px; max-width:1300px; margin:0 auto; wi
 .diff-line.change .diff-sym{color:var(--change);}
 .diff-line.new .diff-sym{color:var(--new);}
 .diff-line.fix .diff-sym{color:var(--new);}
-.diff-line .body{color:#d3d1cb; flex:1; min-width:0; overflow-wrap:break-word;}
+.diff-line .body{color:#d3d1cb; flex:1; min-width:0; overflow-wrap:anywhere; word-break:break-word;}
 .diff-line .target{color:var(--text);font-weight:600;}
 
 .empty-state{
@@ -326,7 +326,7 @@ a.event-card:hover{ border-color:var(--text-faint); transform:translateY(-2px); 
 .sum-headline{ display:flex; align-items:baseline; gap:12px; padding:8px 0; border-bottom:1px solid var(--border); font-size:12.5px; }
 .sum-hl-ver{ font-family:var(--disp); font-weight:700; color:var(--text); flex:none; width:120px; }
 .sum-hl-date{ font-family:var(--mono); color:var(--text-faint); flex:none; width:90px; }
-.sum-hl-title{ color:var(--text-dim); flex:1; min-width:0; overflow-wrap:break-word; }
+.sum-hl-title{ color:var(--text-dim); flex:1; min-width:0; overflow-wrap:anywhere; word-break:break-word; }
 
 .sum-events{ display:flex; flex-direction:column; gap:6px; margin-bottom:8px; }
 .sum-event{ display:flex; align-items:center; gap:10px; font-size:12.5px; color:var(--text-dim); }
