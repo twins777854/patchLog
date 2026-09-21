@@ -24,7 +24,7 @@
 }
 
 *{box-sizing:border-box; overflow-wrap:anywhere;}
-html,body{margin:0;padding:0;overflow-x:hidden;}
+html,body{margin:0;padding:0;}
 body{
   background:var(--bg);
   color:var(--text);
@@ -148,6 +148,7 @@ body{
 
 /* ---- main ---- */
 main{grid-area:main; padding:32px 48px 60px; max-width:1300px; margin:0 auto; width:100%;}
+#detailArea{ max-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
 @media (max-width:600px){ main{padding:22px 18px 48px;} }
 
 .game-head{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:6px; }
