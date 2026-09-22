@@ -131,6 +131,22 @@
   ],
   "events": [
     {
+      "name": "『Apex Legends』×『ストリートファイター6』コラボ",
+      "kind": "コラボ",
+      "start": "2026-09-23",
+      "end": "",
+      "desc": "オリンパスがリミックスされ、リュウや春麗に変身して戦う新モード「APEX K.O.」が登場する。コラボスキン8体やミシック近接武器「波動拳」などが実装される。",
+      "source": "https://fpsjp.net/archives/562743"
+    },
+    {
+      "name": "『Apex Legends』VS『ストリートファイター6』イベント",
+      "kind": "コラボ",
+      "start": "2026-09-22",
+      "end": "2026-10-13",
+      "desc": "『ストリートファイター6』とのコラボイベントが開催。限定モード「ワイルドカード」でリュウや春麗などのアビリティを使えるファイターキットが登場するほか、コラボテーマのスキンや波動拳ミシック汎用格闘が手に入る。",
+      "source": "https://www.ea.com/ja/games/apex-legends/apex-legends/news/street-fighter-6-event"
+    },
+    {
       "name": "『Apex Legends』VS『ストリートファイター6』イベント",
       "kind": "コラボ",
       "start": "2026-09-22",
