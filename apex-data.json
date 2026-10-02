@@ -1,6 +1,20 @@
 {
   "patches": [
     {
+      "ver": "最新アップデート",
+      "date": "2026-10-02",
+      "source": "https://fpsjp.net/archives/565325",
+      "source_name": "fpsjp",
+      "lines": [
+        {
+          "target": "アクセル",
+          "type": "nerf",
+          "magnitude": 2,
+          "text": "パッシブのスライディング制御が半減、戦術の射出速度低下と効果中のエイムアシスト無効化、アルティメットの追跡時間短縮や打ち上げ弱体化など全体的に弱体化。"
+        }
+      ]
+    },
+    {
       "ver": "自動検知パッチ",
       "date": "",
       "source": "https://www.ea.com/ja/games/apex-legends/apex-legends/news/street-fighter-6-event",
