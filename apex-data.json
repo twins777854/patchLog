@@ -2,6 +2,20 @@
   "patches": [
     {
       "ver": "最新アップデート",
+      "date": "2026-10-03",
+      "source": "https://fpsjp.net/archives/565325",
+      "source_name": "fpsjp",
+      "lines": [
+        {
+          "target": "アクセル",
+          "type": "nerf",
+          "magnitude": 3,
+          "text": "パッシブ・戦術・アルティメットの全アビリティが弱体化。ニトロゲート使用中のエイムアシスト無効化や速度・打ち上げの低下などが実施された。"
+        }
+      ]
+    },
+    {
+      "ver": "最新アップデート",
       "date": "2026-10-02",
       "source": "https://fpsjp.net/archives/565325",
       "source_name": "fpsjp",
@@ -144,6 +158,14 @@
     }
   ],
   "events": [
+    {
+      "name": "ストリートファイター6コラボ（APEX K.O.）",
+      "kind": "コラボ",
+      "start": "2026-10-02",
+      "end": "",
+      "desc": "『ストリートファイター6』とのコラボモード「APEX K.O.」のバランス調整を実施。ファイターの被ダメージ軽減率引き下げや、一部キャラのアルティメット最大ストック数減少が行われた。",
+      "source": "https://fpsjp.net/archives/565325"
+    },
     {
       "name": "Apex Legends VS Street Fighter 6",
       "kind": "コラボ",
