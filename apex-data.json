@@ -2,6 +2,20 @@
   "patches": [
     {
       "ver": "最新アップデート",
+      "date": "2026-10-05",
+      "source": "https://fpsjp.net/archives/565424",
+      "source_name": "fpsjp",
+      "lines": [
+        {
+          "target": "ファストドロー",
+          "type": "nerf",
+          "magnitude": 2,
+          "text": "リロード短縮効果が35%から25%に、消耗品の使用時間短縮効果が50%から25%に引き下げ"
+        }
+      ]
+    },
+    {
+      "ver": "最新アップデート",
       "date": "2026-10-04",
       "source": "https://fpsjp.net/archives/565424",
       "source_name": "fpsjp",
