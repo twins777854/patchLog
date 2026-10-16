@@ -201,6 +201,14 @@
   ],
   "events": [
     {
+      "name": "血の盟約イベント",
+      "kind": "期間限定イベント",
+      "start": "2026-10-13",
+      "end": "2026-11-03",
+      "desc": "野獣か悪魔の陣営を選択して戦う期間限定イベント。霧が発生するキングスキャニオンを舞台に、強力なワイルドカードアビリティや限定テーマスキンが登場する。",
+      "source": "https://www.ea.com/ja/games/apex-legends/apex-legends/news/blood-pact-event"
+    },
+    {
       "name": "血の盟約",
       "kind": "期間限定イベント",
       "start": "2026-10-14",
