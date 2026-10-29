@@ -2,6 +2,67 @@
   "patches": [
     {
       "ver": "最新アップデート",
+      "date": "2026-10-29",
+      "source": "https://fpsjp.net/archives/578678",
+      "source_name": "fpsjp",
+      "lines": [
+        {
+          "target": "クリプト",
+          "type": "change",
+          "text": "アビリティが刷新され、スパイドローンがバッテリー制へと移行。新機能セントリーモードの搭載やEMPのワンボタン発動が可能に。"
+        },
+        {
+          "target": "レヴナント",
+          "type": "buff",
+          "magnitude": 2,
+          "text": "アルティメットのクールダウン短縮や戦術アビリティの高速化が行われ、アップグレードでサイレンスなどの旧要素が復活。"
+        },
+        {
+          "target": "ライフライン",
+          "type": "buff",
+          "magnitude": 2,
+          "text": "D.O.C.のクールダウン短縮や滑空中の自己回復が可能になり、アップグレードでリバイブシールドが復活。"
+        },
+        {
+          "target": "ウィングマン",
+          "type": "new",
+          "text": "二丁持ちとなる「アキンボ・ウィングマン」が登場。"
+        }
+      ]
+    },
+    {
+      "ver": "最新アップデート",
+      "date": "2026-10-29",
+      "source": "https://www.ea.com/ja/games/apex-legends/apex-legends/news/cipher-game-updates",
+      "source_name": "ea_official",
+      "lines": [
+        {
+          "target": "クリプト",
+          "type": "change",
+          "text": "スパイドローンがバッテリー駆動に変更されセントリーモードが追加。EMPアルティメットがワンボタンで即時展開可能になるリワークを実施。"
+        },
+        {
+          "target": "ウィングマン",
+          "type": "buff",
+          "magnitude": 2,
+          "text": "二丁拳銃（アキンボ）に対応し、火力が向上。"
+        },
+        {
+          "target": "レヴナント",
+          "type": "buff",
+          "magnitude": 2,
+          "text": "アルティメットのクールダウン短縮と戦術アビリティの高速化に加え、ノック時のULT延長やパウンス命中時のサイレント付与などの新アップグレードを追加。"
+        },
+        {
+          "target": "ライフライン",
+          "type": "buff",
+          "magnitude": 2,
+          "text": "D.O.C.のクールダウン短縮や滑空中の自己回復が可能になり、蘇生中シールドなどの新アップグレードを追加。"
+        }
+      ]
+    },
+    {
+      "ver": "最新アップデート",
       "date": "2026-10-06",
       "source": "https://fpsjp.net/archives/565424",
       "source_name": "fpsjp",
