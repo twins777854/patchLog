@@ -2,6 +2,36 @@
   "patches": [
     {
       "ver": "最新アップデート",
+      "date": "2026-10-30",
+      "source": "https://www.ea.com/ja/games/apex-legends/apex-legends/news/cipher-game-updates",
+      "source_name": "ea_official",
+      "lines": [
+        {
+          "target": "クリプト",
+          "type": "change",
+          "text": "スパイドローンがバッテリー動作に変更され、セントリーモードによる敵の自動マークやボタン1つでのEMP展開が可能になるリワークが実施。"
+        },
+        {
+          "target": "ウィングマン",
+          "type": "new",
+          "text": "二丁拳銃（アキンボ）スタイルで運用が可能に。"
+        },
+        {
+          "target": "レヴナント",
+          "type": "buff",
+          "magnitude": 2,
+          "text": "アルティメットのクールダウン短縮や戦術アビリティの高速化、ノック時のULT延長など各種アビリティを強化。"
+        },
+        {
+          "target": "ライフライン",
+          "type": "buff",
+          "magnitude": 2,
+          "text": "D.O.C.のクールダウン短縮、滑空中での自己回復、蘇生中のシールド展開など回復・サポート能力を強化。"
+        }
+      ]
+    },
+    {
+      "ver": "最新アップデート",
       "date": "2026-10-29",
       "source": "https://fpsjp.net/archives/578678",
       "source_name": "fpsjp",
