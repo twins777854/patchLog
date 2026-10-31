@@ -2,6 +2,66 @@
   "patches": [
     {
       "ver": "最新アップデート",
+      "date": "2026-10-31",
+      "source": "https://www.ea.com/ja/games/apex-legends/apex-legends/news/31-0-designers-notes",
+      "source_name": "ea_official",
+      "lines": [
+        {
+          "target": "ウィングマン",
+          "type": "new",
+          "text": "二丁拳銃（アキンボ）に対応し、交互に連続発砲するバースト仕様が追加"
+        },
+        {
+          "target": "クリプト",
+          "type": "buff",
+          "magnitude": 2,
+          "text": "ドローンの360度スキャンや敵マーキング機能の追加、操作性改善、味方への移動速度上昇パッシブの統合など大幅強化"
+        },
+        {
+          "target": "ライフライン",
+          "type": "buff",
+          "magnitude": 2,
+          "text": "グライド中の回復有効化、戦術クールダウン短縮の基本統合、蘇生シールドアップグレードの復活"
+        },
+        {
+          "target": "レヴナント",
+          "type": "buff",
+          "magnitude": 2,
+          "text": "戦術・ULTのクールダウン短縮、ULT持続時間上限の撤廃、サイレンス付与を含む新アップグレードを追加"
+        },
+        {
+          "target": "ローバ",
+          "type": "nerf",
+          "magnitude": 1,
+          "text": "戦術アビリティのクールダウンが25秒から30秒、アルティメットが120秒から150秒に延長"
+        },
+        {
+          "target": "アクセル",
+          "type": "nerf",
+          "magnitude": 2,
+          "text": "戦術アビリティ中のエイムアシスト無効化や、至近距離におけるキックスタートドローンのノックバック弱体化"
+        },
+        {
+          "target": "プラウラー",
+          "type": "nerf",
+          "magnitude": 1,
+          "text": "使用率および勝率の安定性を抑えるため性能を弱体化"
+        },
+        {
+          "target": "ネメシス",
+          "type": "nerf",
+          "magnitude": 1,
+          "text": "使用率および勝率の安定性を抑えるため性能を弱体化"
+        },
+        {
+          "target": "ヘムロック",
+          "type": "change",
+          "text": "ヘムロック ブリーチARがローテーションから外れ、通常のヘムロックバーストARが復帰"
+        }
+      ]
+    },
+    {
+      "ver": "最新アップデート",
       "date": "2026-10-30",
       "source": "https://www.ea.com/ja/games/apex-legends/apex-legends/news/cipher-game-updates",
       "source_name": "ea_official",
