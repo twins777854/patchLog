@@ -2,6 +2,91 @@
   "patches": [
     {
       "ver": "最新アップデート",
+      "date": "2026-11-02",
+      "source": "https://fpsjp.net/archives/579427",
+      "source_name": "fpsjp",
+      "lines": [
+        {
+          "target": "クリプト",
+          "type": "change",
+          "text": "ドローンの機能変更を伴うレジェンドのリワークが実施予定。"
+        },
+        {
+          "target": "ウィングマン",
+          "type": "new",
+          "text": "二丁持ちが可能となるアキンボ・ウィングマンが追加予定。"
+        }
+      ]
+    },
+    {
+      "ver": "最新アップデート",
+      "date": "2026-11-02",
+      "source": "https://www.ea.com/ja/games/apex-legends/apex-legends/news/cipher-patch-notes",
+      "source_name": "ea_official",
+      "lines": [
+        {
+          "target": "クリプト",
+          "type": "buff",
+          "magnitude": 3,
+          "text": "ドローンがバッテリー式に変更されスキャン・追跡機能が強化。EMPの自傷ダメージが削除され、立ち回りやすく調整。"
+        },
+        {
+          "target": "ライフライン",
+          "type": "buff",
+          "magnitude": 2,
+          "text": "滑空中にD.O.C.で回復可能になり、戦術アビリティのクールダウンが25秒から15秒に短縮。"
+        },
+        {
+          "target": "レヴナント",
+          "type": "buff",
+          "magnitude": 2,
+          "text": "戦術およびアルティメットのクールダウンとチャージ時間が短縮され、新しいアップグレードが追加。"
+        },
+        {
+          "target": "ローバ",
+          "type": "nerf",
+          "magnitude": 1,
+          "text": "戦術アビリティとアルティメットのクールダウンが増加。"
+        },
+        {
+          "target": "アクセル",
+          "type": "nerf",
+          "magnitude": 2,
+          "text": "スライディング制御の低下、ニトロゲート使用時のエイムアシスト増加の無効化など弱体化。"
+        },
+        {
+          "target": "ウィングマン",
+          "type": "new",
+          "text": "アキンボ（2丁持ち）が実装。弾薬がヘビーアモに変更され、基本ダメージ低下や反動増加などの調整が適用。"
+        },
+        {
+          "target": "L-スターEMG",
+          "type": "nerf",
+          "magnitude": 2,
+          "text": "通常ドロップ武器に復帰するが、基本ダメージ低減やオーバーヒートまでの射撃数が減少。"
+        },
+        {
+          "target": "ネメシスバーストAR",
+          "type": "nerf",
+          "magnitude": 1,
+          "text": "垂直反動が増加。"
+        },
+        {
+          "target": "ピースキーパー",
+          "type": "buff",
+          "magnitude": 1,
+          "text": "発射速度が上昇し、ショットガンボルトが再装填速度にも適用されるよう強化。"
+        },
+        {
+          "target": "プラウラーバーストPDW",
+          "type": "nerf",
+          "magnitude": 2,
+          "text": "反動が増加し中・遠距離の安定性が低下。セレクトファイアホップアップが削除。"
+        }
+      ]
+    },
+    {
+      "ver": "最新アップデート",
       "date": "2026-11-01",
       "source": "https://www.ea.com/ja/games/apex-legends/apex-legends/news/31-0-designers-notes",
       "source_name": "ea_official",
@@ -411,6 +496,22 @@
     }
   ],
   "events": [
+    {
+      "name": "ALGS Year 6 チャンピオンシップ",
+      "kind": "リアル連動",
+      "start": "2027-01-28",
+      "end": "2027-01-31",
+      "desc": "日本の札幌で開催されるApex Legendsの大型世界大会。年間チャンピオンを決定する戦いが4日間にわたり繰り広げられる。",
+      "source": "https://fpsjp.net/archives/579427"
+    },
+    {
+      "name": "エーペックスレジェンズ: サイファー",
+      "kind": "中間アップデート",
+      "start": "2026-11-03",
+      "end": "",
+      "desc": "シーズン31「サイファー」が開幕。アキンボ・ウィングマンやストロングホールド等の新要素追加のほか、ランクでのレジェンド禁止システムが導入されます。",
+      "source": "https://www.ea.com/ja/games/apex-legends/apex-legends/news/cipher-patch-notes"
+    },
     {
       "name": "血の盟約イベント",
       "kind": "期間限定イベント",
