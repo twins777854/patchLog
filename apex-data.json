@@ -2,6 +2,106 @@
   "patches": [
     {
       "ver": "最新アップデート",
+      "date": "2026-11-03",
+      "source": "https://fpsjp.net/archives/579389",
+      "source_name": "fpsjp",
+      "lines": [
+        {
+          "target": "クリプト",
+          "type": "change",
+          "text": "能力のリワークが実施される"
+        },
+        {
+          "target": "ウィングマン",
+          "type": "change",
+          "text": "アキンボ（二丁持ち）が追加される"
+        }
+      ]
+    },
+    {
+      "ver": "最新アップデート",
+      "date": "2026-11-03",
+      "source": "https://www.ea.com/ja/games/apex-legends/apex-legends/news/cipher-patch-notes",
+      "source_name": "ea_official",
+      "lines": [
+        {
+          "target": "クリプト",
+          "type": "buff",
+          "magnitude": 3,
+          "text": "ドローンがバッテリー制に変更され、ハンドリング向上、自動スキャン追加、EMP自傷無効化など大幅に強化されました。"
+        },
+        {
+          "target": "ライフライン",
+          "type": "buff",
+          "magnitude": 2,
+          "text": "戦術アビリティのクールダウンが短縮され、滑空中の回復追加や蘇生シールドの復活などの調整が行われました。"
+        },
+        {
+          "target": "レヴナント",
+          "type": "buff",
+          "magnitude": 2,
+          "text": "戦術アビリティとアルティメットのクールダウンが短縮され、新しいアップグレードが追加されました。"
+        },
+        {
+          "target": "ローバ",
+          "type": "nerf",
+          "magnitude": 1,
+          "text": "戦術アビリティとアルティメットのクールダウン時間が増加しました。"
+        },
+        {
+          "target": "アクセル",
+          "type": "nerf",
+          "magnitude": 2,
+          "text": "スライディング制御やニトロゲートのエイムアシスト増加が無効化され、ドローンの追跡時間やノックアップが弱体化されました。"
+        },
+        {
+          "target": "ウィングマン",
+          "type": "change",
+          "text": "ヘビーアモに変更され、2丁所持によるアキンボモードに対応しました。"
+        },
+        {
+          "target": "モザンビーク",
+          "type": "change",
+          "text": "アキンボモザンビークがケアパッケージ武器へ移行し、ダメージ増加やシールド回復効果が追加されました。"
+        },
+        {
+          "target": "EVA-8オート",
+          "type": "change",
+          "text": "ダブルタップトリガーが削除され、ディスラプター弾が装着可能になりました。"
+        },
+        {
+          "target": "ヘムロックバーストAR",
+          "type": "change",
+          "text": "通常武器に戻り、バーストおよび単発射撃モードが復活しました。"
+        },
+        {
+          "target": "L-スターEMG",
+          "type": "nerf",
+          "magnitude": 2,
+          "text": "地上ドロップ武器に復帰し、基本ダメージやオーバーヒートまでの発射数が減少しました。"
+        },
+        {
+          "target": "ネメシスバーストAR",
+          "type": "nerf",
+          "magnitude": 1,
+          "text": "垂直反動が増加しました。"
+        },
+        {
+          "target": "ピースキーパー",
+          "type": "buff",
+          "magnitude": 2,
+          "text": "発射速度が向上し、ショットガンボルトの効果が再装填速度と連射速度の両方に適用されるようになりました。"
+        },
+        {
+          "target": "プラウラーバーストPDW",
+          "type": "nerf",
+          "magnitude": 2,
+          "text": "反動が増加し、セレクトファイアホップアップが削除されました。"
+        }
+      ]
+    },
+    {
+      "ver": "最新アップデート",
       "date": "2026-11-02",
       "source": "https://fpsjp.net/archives/579427",
       "source_name": "fpsjp",
@@ -496,6 +596,22 @@
     }
   ],
   "events": [
+    {
+      "name": "シーズン31「サイファー」",
+      "kind": "中間アップデート",
+      "start": "2026-11-04",
+      "end": "",
+      "desc": "新シーズン「サイファー」が開幕する。クリプトのリワークやウィングマンのアキンボ化、ランクにおけるレジェンドBAN機能などが導入される。",
+      "source": "https://fpsjp.net/archives/579389"
+    },
+    {
+      "name": "Apex Legends: サイファー (シーズン31)",
+      "kind": "中間アップデート",
+      "start": "2026-11-03",
+      "end": "",
+      "desc": "新シーズン「サイファー」が開幕します。アキンボ・ウィングマンや新要素「ストロングホールド」の登場、ランクマッチでのレジェンド禁止機能の導入など大型アップデートが実施されます。",
+      "source": "https://www.ea.com/ja/games/apex-legends/apex-legends/news/cipher-patch-notes"
+    },
     {
       "name": "ALGS Year 6 チャンピオンシップ",
       "kind": "リアル連動",
