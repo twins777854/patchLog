@@ -597,6 +597,14 @@
   ],
   "events": [
     {
+      "name": "ゴジライベント",
+      "kind": "コラボ",
+      "start": "2026-11-10",
+      "end": "2026-12-01",
+      "desc": "映画『ゴジラ-0.0』の劇場公開を記念して開催されるコラボイベント。ストームポイントにゴジラが襲来し、追尾攻撃が可能なカスタム仕様のディヴォーションや、ゴジラシリーズをモチーフにした各種限定装飾アイテムが登場します。",
+      "source": "https://www.ea.com/ja/games/apex-legends/apex-legends/news/godzilla-event"
+    },
+    {
       "name": "Red Bull Legends Inn",
       "kind": "コラボ",
       "start": "2026-12-05",
